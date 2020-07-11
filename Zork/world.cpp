@@ -65,6 +65,7 @@ World::World()
 // ----------------------------------------------------
 World::~World()
 {
+	/* Deletes every entity in the world */
 	for(list<Entity*>::iterator it = entities.begin(); it != entities.end(); ++it)
 		delete *it;
 
@@ -74,10 +75,10 @@ World::~World()
 // ----------------------------------------------------
 bool World::Tick(vector<string>& args)
 {
-	bool ret = true;
+	bool ret = true; // if there aren't commands in args, returns true
 
 	if(args.size() > 0 && args[0].length() > 0)
-		ret = ParseCommand(args);
+		ret = ParseCommand(args); // analize command in args
 
 	GameLoop();
 
@@ -87,6 +88,7 @@ bool World::Tick(vector<string>& args)
 // ----------------------------------------------------
 void World::GameLoop()
 {
+	/* Calls every entity Tick method if 0.5s have passed since last tick */
 	clock_t now = clock();
 
 	if((now - tick_timer) / CLOCKS_PER_SEC > TICK_FREQUENCY)
@@ -101,6 +103,8 @@ void World::GameLoop()
 // ----------------------------------------------------
 bool World::ParseCommand(vector<string>& args)
 {
+	/* Calls the appropriate player method depending on the command and the number of arguments.
+	Returns false in case of unknown command. */
 	bool ret = true;
 
 	switch(args.size())

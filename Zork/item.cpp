@@ -9,7 +9,7 @@ Item::Item(const char* title, const char* description, Entity* parent, ItemType 
 Entity(title, description, parent), item_type(item_type)
 {
 	type = ITEM;
-	min_value = max_value = 0;
+	min_value = max_value = 0; // (??) sets min and max values to 0
 }
 
 // ----------------------------------------------------
@@ -19,6 +19,7 @@ Item::~Item()
 // ----------------------------------------------------
 void Item::Look() const
 {
+	/* Outputs the item description and if it contains other items in it, outputs their names */
 	cout << "\n" << name << "\n";
 	cout << description << "\n";
 
@@ -36,5 +37,6 @@ void Item::Look() const
 // ----------------------------------------------------
 int Item::GetValue() const
 {
+	/* Returns a random value between min and max if max>0, otherwise returns 0 */
 	return Roll(min_value, max_value);
 }

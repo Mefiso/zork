@@ -7,7 +7,7 @@
 
 // ----------------------------------------------------
 Room::Room(const char* title, const char* description) :
-Entity(title, description, NULL)
+Entity(title, description, NULL) // Rooms are not contained in any Entity
 {
 	type = ROOM;
 }
@@ -20,6 +20,7 @@ Room::~Room()
 // ----------------------------------------------------
 void Room::Look() const
 {
+	// Outputs room description
 	cout << "\n" << name << "\n";
 	cout << description;
 
@@ -61,6 +62,7 @@ void Room::Look() const
 // ----------------------------------------------------
 Exit* Room::GetExit(const string& direction) const
 {
+	/* Iterates over contained entities and returns the Exit with direction arg as name */
 	for(list<Entity*>::const_iterator it = container.begin(); it != container.cend(); ++it)
 	{
 		if((*it)->type == EXIT)

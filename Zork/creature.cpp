@@ -7,7 +7,7 @@
 
 // ----------------------------------------------------
 Creature::Creature(const char* title, const char* description, Room* room) :
-Entity(title, description, (Entity*)room)
+Entity(title, description, (Entity*)room) // Where the Creature is, currently.
 {
 	type = CREATURE;
 	hit_points = 1;
@@ -23,6 +23,8 @@ Creature::~Creature()
 // ----------------------------------------------------
 void Creature::Look(const vector<string>& args) const
 {
+	/* If the creature is alive outputs name and description, if not announces that it is dead
+	and outputs name and description. */
 	if(IsAlive())
 	{
 		cout << name << "\n";
@@ -38,6 +40,7 @@ void Creature::Look(const vector<string>& args) const
 // ----------------------------------------------------
 bool Creature::Go(const vector<string>& args)
 {
+	/* Moves this Creature through the specified Exit */
 	if(!IsAlive())
 		return false;
 
@@ -46,10 +49,11 @@ bool Creature::Go(const vector<string>& args)
 	if(exit == NULL)
 		return false;
 
-	if(PlayerInRoom())
+	if(PlayerInRoom()) 
 		cout << name << "goes " << args[1] << "...\n";
 
-	ChangeParentTo(exit->GetDestinationFrom((Room*) parent));
+	ChangeParentTo(exit->GetDestinationFrom((Room*) parent)); 
+	// Changes parent to the Room at the opposite side of the Exit
 
 	return true;
 }
@@ -57,10 +61,13 @@ bool Creature::Go(const vector<string>& args)
 // ----------------------------------------------------
 bool Creature::Take(const vector<string>& args)
 {
+	/* Finds the Item with the specified name among current Room contained entities. 
+	If it can't, tries to find inside another item from Creature's inventory. In any case, if 
+	found, the Item is moved to the root of the Inventory (list of contained entities by Creature)	*/
 	if(!IsAlive())
 		return false;
 
-	Item* item = (Item*)parent->Find(args[1], ITEM);
+	Item* item = (Item*)parent->Find(args[1], ITEM); // Casts Entity* to Item*
 
 	if(args.size() > 1)
 	{
@@ -68,12 +75,12 @@ bool Creature::Take(const vector<string>& args)
 		if(item == NULL)
 			item = (Item*)Find(args[1], ITEM);
 
-		if(item == NULL)
+		if(item == NULL) // Item can't be found
 			return false;
 
-		Item* subitem = (Item*)item->Find(args[3], ITEM);
+		Item* subitem = (Item*)item->Find(args[3], ITEM); // Search Item inside Item
 
-		if(subitem == NULL)
+		if(subitem == NULL) // Subitem not found
 			return false;
 
 		if(PlayerInRoom())
@@ -82,13 +89,13 @@ bool Creature::Take(const vector<string>& args)
 		item = subitem;
 	}
 
-	if(item == NULL)
+	if(item == NULL) // Item not found
 		return false;
 
 	if(PlayerInRoom())
 		cout << name << " takes " << item->name << ".\n";
 
-	item->ChangeParentTo(this);
+	item->ChangeParentTo(this); // Stores the Item on the Inventory.
 
 	return true;
 }
@@ -96,6 +103,7 @@ bool Creature::Take(const vector<string>& args)
 // ----------------------------------------------------
 void Creature::Inventory() const
 {
+	/* Simply lists all contained Items. */
 	list<Entity*> items;
 	FindAll(ITEM, items);
 
@@ -120,6 +128,7 @@ void Creature::Inventory() const
 // ----------------------------------------------------
 bool Creature::Equip(const vector<string>& args)
 {
+	/* Equips the specified Item if it is an armour or a weapon */
 	if(!IsAlive())
 		return false;
 
@@ -151,6 +160,7 @@ bool Creature::Equip(const vector<string>& args)
 // ----------------------------------------------------
 bool Creature::UnEquip(const vector<string>& args)
 {
+	/* Unequips the specified armour/weapon if currently equipped. */
 	if(!IsAlive())
 		return false;
 
@@ -176,6 +186,7 @@ bool Creature::UnEquip(const vector<string>& args)
 // ----------------------------------------------------
 bool Creature::AutoEquip()
 {
+	/* Iterates over contained items and equips the last weapon and armour that it finds. */
 	if(!IsAlive())
 		return false;
 
@@ -198,6 +209,7 @@ bool Creature::AutoEquip()
 // ----------------------------------------------------
 bool Creature::Lock(const vector<string>& args)
 {
+	/* Locks the specified Exit with an Item if it is the appropriate key. */
 	if(!IsAlive())
 		return false;
 
@@ -222,6 +234,7 @@ bool Creature::Lock(const vector<string>& args)
 // ----------------------------------------------------
 bool Creature::UnLock(const vector<string>& args)
 {
+	/* Unlocks the specified Exit with an Item if it is the appropriate key. */
 	if(!IsAlive())
 		return false;
 
@@ -246,6 +259,7 @@ bool Creature::UnLock(const vector<string>& args)
 // ----------------------------------------------------
 bool Creature::Drop(const vector<string>& args)
 {
+	/* Moves Item from inventory to the current room. */
 	if(!IsAlive())
 		return false;
 
@@ -271,7 +285,7 @@ Room* Creature::GetRoom() const
 // ----------------------------------------------------
 bool Creature::PlayerInRoom() const
 {
-	return parent->Find(PLAYER) != NULL;
+	return parent->Find(PLAYER) != NULL; // Whether player in room or not.
 }
 
 // ----------------------------------------------------
@@ -283,6 +297,7 @@ bool Creature::IsAlive() const
 // ----------------------------------------------------
 void Creature::Tick()
 {
+	/* If the combat target is in the current room, attacks it. */
 	if(combat_target != NULL)
 	{
 		if(parent->Find(combat_target) == true)
@@ -295,6 +310,8 @@ void Creature::Tick()
 // ----------------------------------------------------
 bool Creature::Attack(const vector<string>& args)
 {
+	/* If the specified creature can be found in current room, the combat_target is set to that
+	creature*/
 	Creature *target = (Creature*)parent->Find(args[1], CREATURE);
 
 	if(target == NULL)
@@ -308,7 +325,9 @@ bool Creature::Attack(const vector<string>& args)
 // ----------------------------------------------------
 int Creature::MakeAttack()
 {
-	if(!IsAlive() || !combat_target->IsAlive())
+	/* Rolls damage from weapon and applies it to the comabt target Creature. It also makes this
+	Creature the target of the combat target if it wasn't. */
+	if(!IsAlive() || !combat_target->IsAlive()) // If either combatants are dead, remove targets.
 	{
 		combat_target = combat_target->combat_target = NULL;
 		return false;
