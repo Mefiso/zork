@@ -151,6 +151,18 @@ void Player::Inventory() const
 			cout << "\n" << (*it)->name << " (as armour)";
 		else
 			cout << "\n" << (*it)->name;
+			list<Entity*> stuff;
+			(*it)->FindAll(ITEM, stuff);
+
+			if (stuff.size() > 0) { // If an item contains more inside, list them.
+				cout << " containing ";
+				for (list<Entity*>::const_iterator it2 = stuff.begin(); it2 != stuff.cend(); ++it2)
+					cout << (*it2)->name << ", ";
+				cout << "\b\b";
+				cout << ".";
+				cout << '\b';
+			}
+			
 	}
 
 	cout << "\n";
