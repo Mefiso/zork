@@ -137,7 +137,7 @@ bool Creature::Equip(const vector<string>& args)
 	if(item == NULL)
 		return false;
 
-	switch(item->type)
+	switch(item->item_type)
 	{
 		case WEAPON:
 		weapon = item;
@@ -350,6 +350,7 @@ int Creature::MakeAttack()
 // ----------------------------------------------------
 int Creature::ReceiveAttack(int damage)
 {
+	/* Subtract as many hit points as damage surpasses Creature's armour */
 	int prot = (armour) ? armour->GetValue() : Roll(min_protection, max_protection);
 	int received = damage - prot;
 
@@ -374,6 +375,7 @@ void Creature::Die()
 // ----------------------------------------------------
 bool Creature::Loot(const vector<string>& args)
 {
+	/* Takes all the items from the specified corpse. */
 	Creature *target = (Creature*)parent->Find(args[1], CREATURE);
 
 	if(target == NULL && target->IsAlive() == false)
@@ -396,6 +398,7 @@ bool Creature::Loot(const vector<string>& args)
 // ----------------------------------------------------
 void Creature::Stats() const
 {
+	/* Prints all creature stats. */
 	cout << "\nHit Points: " << hit_points;
 	cout << "\nAttack: (" << ((weapon) ? weapon->name : "no weapon") << ") ";
 	cout << ((weapon) ? weapon->min_value : min_damage) << "-" << ((weapon) ? weapon->max_value : max_damage);

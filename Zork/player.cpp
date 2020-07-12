@@ -20,6 +20,8 @@ Player::~Player()
 // ----------------------------------------------------
 void Player::Look(const vector<string>& args) const
 {
+	/* If command has arguments, it calls the Look method from the specified Entities in those arguments.
+	Otherwise, it calls current Room's Look method. */
 	if(args.size() > 1)
 	{
 		for(list<Entity*>::const_iterator it = parent->container.begin(); it != parent->container.cend(); ++it)
@@ -46,6 +48,7 @@ void Player::Look(const vector<string>& args) const
 // ----------------------------------------------------
 bool Player::Go(const vector<string>& args)
 {
+	/* Moves the player through the specified Exit if possible */
 	Exit* exit = GetRoom()->GetExit(args[1]);
 
 	if(exit == NULL)
@@ -71,13 +74,16 @@ bool Player::Go(const vector<string>& args)
 // ----------------------------------------------------
 bool Player::Take(const vector<string>& args)
 {
-	if(args.size() == 4)
+	/* Tries to pick the specified object either from the Room or from another Item in eithe the 
+	inventory or the current Room. */
+	
+	if(args.size() == 4) // For subitems inside items
 	{
-		Item* item = (Item*)parent->Find(args[3], ITEM);
+		Item* item = (Item*)parent->Find(args[3], ITEM); // From Room
 
 		// we could pick something from a container in our inventory ...
 		if(item == NULL)
-			item = (Item*)Find(args[3], ITEM);
+			item = (Item*)Find(args[3], ITEM); // From inventory
 
 		if(item == NULL)
 		{
@@ -85,7 +91,7 @@ bool Player::Take(const vector<string>& args)
 			return false;
 		}
 
-		Item* subitem = (Item*)item->Find(args[1], ITEM);
+		Item* subitem = (Item*)item->Find(args[1], ITEM); // Item inside another
 
 		if(subitem == NULL)
 		{
@@ -94,9 +100,9 @@ bool Player::Take(const vector<string>& args)
 		}
 
 		cout << "\nYou take " << subitem->name << " from " << item->name << ".\n";
-		subitem->ChangeParentTo(this);
+		subitem->ChangeParentTo(this); // Moves to root inventory.
 	}
-	else if(args.size() == 2)
+	else if(args.size() == 2) // For items in room
 	{
 		Item* item = (Item*)parent->Find(args[1], ITEM);
 
@@ -116,6 +122,7 @@ bool Player::Take(const vector<string>& args)
 // ----------------------------------------------------
 void Player::Inventory() const
 {
+	/* Simply lists all contained Items. */
 	list<Entity*> items;
 	FindAll(ITEM, items);
 
@@ -141,6 +148,7 @@ void Player::Inventory() const
 // ----------------------------------------------------
 bool Player::Drop(const vector<string>& args)
 {
+	/* Leaves an Item from your inventory on the room or inside another Item. */
 	if(args.size() == 2)
 	{
 		Item* item = (Item*)Find(args[1], ITEM);
@@ -156,7 +164,7 @@ bool Player::Drop(const vector<string>& args)
 
 		return true;
 	}
-	else if(args.size() == 4)
+	else if(args.size() == 4) // Drop it inside another Item
 	{
 		Item* item = (Item*)Find(args[1], ITEM);
 
@@ -166,7 +174,7 @@ bool Player::Drop(const vector<string>& args)
 			return false;
 		}
 
-		Item* container = (Item*)parent->Find(args[3], ITEM);
+		Item* container = (Item*)parent->Find(args[3], ITEM); 
 
 		if(container == NULL)
 		{
@@ -187,6 +195,7 @@ bool Player::Drop(const vector<string>& args)
 // ----------------------------------------------------
 bool Player::Equip(const vector<string>& args)
 {
+	/* Equips the specified Item if it is an armour or a weapon */
 	Item* item = (Item*)Find(args[1], ITEM);
 
 	if(item == NULL)
@@ -218,6 +227,7 @@ bool Player::Equip(const vector<string>& args)
 // ----------------------------------------------------
 bool Player::UnEquip(const vector<string>& args)
 {
+	/* Unequips the specified armour/weapon if currently equipped */
 	if(!IsAlive())
 		return false;
 
@@ -247,6 +257,7 @@ bool Player::UnEquip(const vector<string>& args)
 // ----------------------------------------------------
 bool Player::Examine(const vector<string>& args) const
 {
+	/* Prints invetory and stats of target creature if it is on the Room */
 	Creature *target = (Creature*)parent->Find(args[1], CREATURE);
 
 	if(target == NULL)
@@ -264,6 +275,8 @@ bool Player::Examine(const vector<string>& args) const
 // ----------------------------------------------------
 bool Player::Attack(const vector<string>& args)
 {
+	/* If the specified creature can be found in the current room, the combat_targetis set to that
+	creature. */
 	Creature *target = (Creature*)parent->Find(args[1], CREATURE);
 
 	if(target == NULL)
@@ -280,6 +293,7 @@ bool Player::Attack(const vector<string>& args)
 // ----------------------------------------------------
 bool Player::Loot(const vector<string>& args)
 {
+	/* Takes all the items from the specified corpse. */
 	Creature *target = (Creature*)parent->Find(args[1], CREATURE);
 
 	if(target == NULL)
