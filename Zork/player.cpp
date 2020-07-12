@@ -179,8 +179,10 @@ bool Player::Drop(const vector<string>& args)
 		if(container == NULL)
 		{
 			container = (Item*)Find(args[3], ITEM);
-			cout << "\nCan not find '" << args[3] << "' in your inventory or in the room.\n";
-			return false;
+			if (container == NULL) {
+				cout << "\nCan not find '" << args[3] << "' in your inventory or in the room.\n";
+				return false;
+			}
 		}
 
 		cout << "\nYou put " << item->name << " into " << container->name << ".\n";

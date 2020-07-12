@@ -44,7 +44,7 @@ World::World()
 	sword->min_value = 2;
 	sword->max_value = 6;
 
-	Item* sword2(sword);
+	Item* sword2 = new Item(*sword);
 	sword2->ChangeParentTo(butler);
 
 	Item* shield = new Item("Shield", "An old wooden shield.", butler, ARMOUR);
