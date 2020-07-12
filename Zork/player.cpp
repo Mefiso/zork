@@ -24,9 +24,20 @@ void Player::Look(const vector<string>& args) const
 	Otherwise, it calls current Room's Look method. */
 	if(args.size() > 1)
 	{
+		// Looks for the enitity in the room.
 		for(list<Entity*>::const_iterator it = parent->container.begin(); it != parent->container.cend(); ++it)
 		{
 			if(Same((*it)->name, args[1]) || ((*it)->type == EXIT && Same(args[1], ((Exit*)(*it))->GetNameFrom((Room*)parent))))
+			{
+				(*it)->Look();
+				return;
+			}
+		}
+		
+		// Looks for the entity in the inventory.
+		for (list<Entity*>::const_iterator it = container.begin(); it != container.cend(); ++it)
+		{
+			if (Same((*it)->name, args[1]) || ((*it)->type == EXIT && Same(args[1], ((Exit*)(*it))->GetNameFrom((Room*)parent))))
 			{
 				(*it)->Look();
 				return;
