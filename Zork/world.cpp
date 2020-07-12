@@ -107,6 +107,8 @@ bool World::ParseCommand(vector<string>& args)
 	Returns false in case of unknown command. */
 	bool ret = true;
 
+	/* Some player methods return true or false but that value is not used here. They could be void
+	but it was preferred to maintain the boolean return for possible future usages. */ 
 	switch(args.size())
 	{
 		case 1: // commands with no arguments ------------------------------

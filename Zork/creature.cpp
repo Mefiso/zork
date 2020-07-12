@@ -27,12 +27,12 @@ void Creature::Look(const vector<string>& args) const
 	and outputs name and description. */
 	if(IsAlive())
 	{
-		cout << name << "\n";
+		cout << "\n" << name << "\n";
 		cout << description << "\n";
 	}
 	else
 	{
-		cout << name << "'s corpse\n";
+		cout << "\n" << name << "'s corpse\n";
 		cout << "Here lies dead: " << description << "\n";
 	}
 }

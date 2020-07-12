@@ -20,7 +20,7 @@ Entity::~Entity()
 void Entity::Look() const
 {
 	/* Outputs the description of this Entity, e.g. room description. */
-	cout << name << "\n";
+	cout << "\n" << name << "\n";
 	cout << description << "\n";
 }
 

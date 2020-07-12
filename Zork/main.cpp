@@ -69,7 +69,7 @@ int main()
 			/* If there's still commands in args vector, deletes them. */
 			args.clear();
 			player_input = "";
-			cout << "> ";
+			cout << "\n> ";
 		}
 	}
 
