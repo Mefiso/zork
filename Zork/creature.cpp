@@ -27,12 +27,12 @@ void Creature::Look(const vector<string>& args) const
 	and outputs name and description. */
 	if(IsAlive())
 	{
-		cout << name << "\n";
+		cout << "\n" << name << "\n";
 		cout << description << "\n";
 	}
 	else
 	{
-		cout << name << "'s corpse\n";
+		cout << "\n" << name << "'s corpse\n";
 		cout << "Here lies dead: " << description << "\n";
 	}
 }
@@ -378,7 +378,7 @@ bool Creature::Loot(const vector<string>& args)
 	/* Takes all the items from the specified corpse. */
 	Creature *target = (Creature*)parent->Find(args[1], CREATURE);
 
-	if(target == NULL && target->IsAlive() == false)
+	if(target == NULL || target->IsAlive() == true) // No target or target not dead
 		return false;
 
 	list<Entity*> items;

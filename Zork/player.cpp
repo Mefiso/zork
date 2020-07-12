@@ -24,9 +24,20 @@ void Player::Look(const vector<string>& args) const
 	Otherwise, it calls current Room's Look method. */
 	if(args.size() > 1)
 	{
+		// Looks for the enitity in the room.
 		for(list<Entity*>::const_iterator it = parent->container.begin(); it != parent->container.cend(); ++it)
 		{
 			if(Same((*it)->name, args[1]) || ((*it)->type == EXIT && Same(args[1], ((Exit*)(*it))->GetNameFrom((Room*)parent))))
+			{
+				(*it)->Look();
+				return;
+			}
+		}
+		
+		// Looks for the entity in the inventory.
+		for (list<Entity*>::const_iterator it = container.begin(); it != container.cend(); ++it)
+		{
+			if (Same((*it)->name, args[1]) || ((*it)->type == EXIT && Same(args[1], ((Exit*)(*it))->GetNameFrom((Room*)parent))))
 			{
 				(*it)->Look();
 				return;
@@ -140,6 +151,18 @@ void Player::Inventory() const
 			cout << "\n" << (*it)->name << " (as armour)";
 		else
 			cout << "\n" << (*it)->name;
+			list<Entity*> stuff;
+			(*it)->FindAll(ITEM, stuff);
+
+			if (stuff.size() > 0) { // If an item contains more inside, list them.
+				cout << " containing ";
+				for (list<Entity*>::const_iterator it2 = stuff.begin(); it2 != stuff.cend(); ++it2)
+					cout << (*it2)->name << ", ";
+				cout << "\b\b";
+				cout << ".";
+				cout << '\b';
+			}
+			
 	}
 
 	cout << "\n";
@@ -179,8 +202,10 @@ bool Player::Drop(const vector<string>& args)
 		if(container == NULL)
 		{
 			container = (Item*)Find(args[3], ITEM);
-			cout << "\nCan not find '" << args[3] << "' in your inventory or in the room.\n";
-			return false;
+			if (container == NULL) {
+				cout << "\nCan not find '" << args[3] << "' in your inventory or in the room.\n";
+				return false;
+			}
 		}
 
 		cout << "\nYou put " << item->name << " into " << container->name << ".\n";

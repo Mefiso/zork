@@ -44,7 +44,7 @@ World::World()
 	sword->min_value = 2;
 	sword->max_value = 6;
 
-	Item* sword2(sword);
+	Item* sword2 = new Item(*sword);
 	sword2->ChangeParentTo(butler);
 
 	Item* shield = new Item("Shield", "An old wooden shield.", butler, ARMOUR);
@@ -107,6 +107,8 @@ bool World::ParseCommand(vector<string>& args)
 	Returns false in case of unknown command. */
 	bool ret = true;
 
+	/* Some player methods return true or false but that value is not used here. They could be void
+	but it was preferred to maintain the boolean return for possible future usages. */ 
 	switch(args.size())
 	{
 		case 1: // commands with no arguments ------------------------------
