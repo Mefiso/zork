@@ -3,10 +3,11 @@
 #include "Entity.h"
 
 // ----------------------------------------------------
-Entity::Entity(const char* name, const char* description, Entity* parent = NULL) :
-name(name), description(description), parent(parent)
+Entity::Entity(const char* name, const char* description, const int capacity, Entity* parent = NULL) :
+name(name), description(description), parent(parent), capacity(capacity)
 {
 	type = ENTITY;
+	current_storage = 0;
 
 	if(parent != NULL) // Put this Entity to its containing Entity
 		parent->container.push_back(this);

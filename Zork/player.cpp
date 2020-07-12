@@ -6,8 +6,8 @@
 #include "player.h"
 
 // ----------------------------------------------------
-Player::Player(const char* title, const char* description, Room* room) :
-Creature(title, description, room)
+Player::Player(const char* title, const char* description, Room* room, const int capacity) :
+Creature(title, description, room, capacity)
 {
 	type = PLAYER;
 }
@@ -110,6 +110,10 @@ bool Player::Take(const vector<string>& args)
 			return false;
 		}
 
+		if(current_storage + subitem->item_size > capacity) {
+			cout << "\nCannot take " << subitem->name << ". Inventory is full.\n";
+			return false;
+		}
 		cout << "\nYou take " << subitem->name << " from " << item->name << ".\n";
 		subitem->ChangeParentTo(this); // Moves to root inventory.
 	}
@@ -123,6 +127,10 @@ bool Player::Take(const vector<string>& args)
 			return false;
 		}
 
+		if (current_storage + item->item_size > capacity) {
+			cout << "\nCannot take " << item->name << ". Inventory is full.\n";
+			return false;
+		}
 		cout << "\nYou take " << item->name << ".\n";
 		item->ChangeParentTo(this);
 	}
@@ -208,6 +216,10 @@ bool Player::Drop(const vector<string>& args)
 			}
 		}
 
+		if(container->current_storage + item->item_size > container->capacity) {
+			cout << "\nCannot put " << item->name << " into " << container->name << ".\n";
+			return false;
+		}
 		cout << "\nYou put " << item->name << " into " << container->name << ".\n";
 		item->ChangeParentTo(container);
 

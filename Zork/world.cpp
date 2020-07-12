@@ -30,34 +30,36 @@ World::World()
 	entities.push_back(ex2);
 
 	// Creatures ----
-	Creature* butler = new Creature("Butler", "It's James, the house Butler.", house);
+	Creature* butler = new Creature("Butler", "It's James, the house Butler.", house, 10);
 	butler->hit_points = 10;
 
 	entities.push_back(butler);
 
 	// Items -----
-	Item* mailbox = new Item("Mailbox", "Looks like it might contain something.", house);
-	Item* key = new Item("Key", "Old iron key.", mailbox);
+	Item* mailbox = new Item("Mailbox", "Looks like it might contain something.", house, 3, 3);
+	Item* key = new Item("Key", "Old iron key.", mailbox, 0, 1);
 	ex2->key = key;
 
-	Item* sword = new Item("Sword", "A simple old and rusty sword.", forest, WEAPON);
+	Item* sword = new Item("Sword", "A simple old and rusty sword.", forest, 0, 4, WEAPON);
 	sword->min_value = 2;
 	sword->max_value = 6;
 
 	Item* sword2 = new Item(*sword);
 	sword2->ChangeParentTo(butler);
 
-	Item* shield = new Item("Shield", "An old wooden shield.", butler, ARMOUR);
+	Item* shield = new Item("Shield", "An old wooden shield.", butler, 0, 5, ARMOUR);
 	shield->min_value = 1;
 	shield->max_value = 3;
 	butler->AutoEquip();
 
+	entities.push_back(key);
 	entities.push_back(mailbox);
 	entities.push_back(sword);
+	entities.push_back(sword2);
 	entities.push_back(shield);
 
 	// Player ----
-	player = new Player("Hero", "You are an awesome adventurer!", forest);
+	player = new Player("Hero", "You are an awesome adventurer!", forest, 5);
 	player->hit_points = 25;
 	entities.push_back(player);
 }

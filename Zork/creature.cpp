@@ -6,8 +6,8 @@
 #include "creature.h"
 
 // ----------------------------------------------------
-Creature::Creature(const char* title, const char* description, Room* room) :
-Entity(title, description, (Entity*)room) // Where the Creature is, currently.
+Creature::Creature(const char* title, const char* description, Room* room, const int capacity) :
+Entity(title, description, capacity, (Entity*)room/*Where the Creature is, currently*/)
 {
 	type = CREATURE;
 	hit_points = 1;
@@ -84,7 +84,7 @@ bool Creature::Take(const vector<string>& args)
 			return false;
 
 		if(PlayerInRoom())
-			cout << name << " looks into " << item->name << "...\n";
+			cout << "\n" << name << " looks into " << item->name << "...\n";
 
 		item = subitem;
 	}
@@ -92,8 +92,14 @@ bool Creature::Take(const vector<string>& args)
 	if(item == NULL) // Item not found
 		return false;
 
+	if(current_storage + item->item_size > capacity) {
+		if (PlayerInRoom())
+			cout << "\n" << name << " tries to take " << item->name << ", but " << name << " can't carry more objects.\n";
+		return false;
+	}
+	
 	if(PlayerInRoom())
-		cout << name << " takes " << item->name << ".\n";
+		cout << "\n" << name << " takes " << item->name << ".\n";
 
 	item->ChangeParentTo(this); // Stores the Item on the Inventory.
 
@@ -109,7 +115,7 @@ void Creature::Inventory() const
 
 	if(items.size() == 0)
 	{
-		cout << name << " does not own any items\n";
+		cout << "\n" << name << " does not own any items\n";
 		return;
 	}
 
@@ -152,7 +158,7 @@ bool Creature::Equip(const vector<string>& args)
 	}
 
 	if(PlayerInRoom())
-		cout << name << " equips " << item->name << "...\n";
+		cout << "\n" << name << " equips " << item->name << "...\n";
 
 	return true;
 }
@@ -177,7 +183,7 @@ bool Creature::UnEquip(const vector<string>& args)
 		return false;
 
 	if(PlayerInRoom())
-		cout << name << " un-equips " << item->name << "...\n";
+		cout << "\n" << name << " un-equips " << item->name << "...\n";
 
 	return true;
 }
@@ -269,7 +275,7 @@ bool Creature::Drop(const vector<string>& args)
 		return false;
 
 	if(PlayerInRoom())
-		cout << name << " drops " << item->name << "...\n";
+		cout << "\n" << name << " drops " << item->name << "...\n";
 	
 	item->ChangeParentTo(parent);
 

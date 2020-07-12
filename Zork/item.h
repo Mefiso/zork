@@ -18,16 +18,18 @@ enum ItemType
 class Item : public Entity
 {
 public:
-	Item(const char* name, const char* description, Entity* parent, ItemType item_type = COMMON);
+	Item(const char* name, const char* description, Entity* parent, const int capacity, const int size, ItemType item_type = COMMON);
 	~Item();
 
 	void Look() const;
+	void ChangeParentTo(Entity* new_parent);
 	int GetValue() const;
 
 public :
 	int min_value;
 	int max_value;
 	ItemType item_type;
+	int item_size;
 };
 
 #endif //__Item__
