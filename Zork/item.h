@@ -31,6 +31,9 @@ public :
 	int max_value;
 	ItemType item_type;
 	int item_size;
+	bool locked;
+	Entity* key;
+
 };
 
 #endif //__Item__

@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include "globals.h"
 #include "entity.h"
 #include "creature.h"
@@ -25,7 +25,7 @@ World::World()
 
 	Exit* ex1 = new Exit("east", "west", "Little path", house, forest);
 	Exit* ex2 = new Exit("down", "up", "Stairs", house, basement);
-	Exit* ex3 = new Exit("westdoor", "east", "White wooden door.", house, beach);
+	Exit* ex3 = new Exit("westdoor", "east", "There's a white wooden door.", house, beach);
 	Exit* ex4 = new Exit("south", "north", "Crooked trail.", forest, cemetery);
 	Exit* ex5 = new Exit("northwest", "southeast", "Old pathway.", forest, hillside);
 	Exit* ex6 = new Exit("up", "down", "Mountain route.", hillside, hilltop);
@@ -86,9 +86,12 @@ World::World()
 	ex3->key = key;
 	Item* sack = new Item("Sack", "Brown old sack. Looks like it might contain something.", forest, 5, 4);
 	Item* apple = new Item("Apple", "A perfect red apple.", sack, 0, 1);
-	Item* crystal_ball = new Item("Crystal ball", "The witch's clairvoyant ball.", witch, 0, 2);
-	Item* chest = new Item("Small chest", "Wooden chest with iron lock.", cave, 4, 4);
+	Item* crystal_ball = new Item("Palantír", "The witch's clairvoyant ball.", witch, 0, 2);
+	Item* chest = new Item("Chest", "Wooden small chest with iron lock.", cave, 4, 4);
+	chest->locked = true;
 	Item* pouch = new Item("Pouch", "Pouch filled with gold pieces.", chest, 0, 2);
+	Item* black_key = new Item("Black-key", "A black iron key.", witch, 0, 1);
+	chest->key = black_key;
 
 	// Weapons and armours --
 	Item* sword = new Item("Sword", "A simple old and rusty sword.", forest, 0, 4, M_WEAPON);
@@ -102,11 +105,11 @@ World::World()
 	broom->min_value = 0;
 	broom->max_value = 3;
 
-	Item* knife = new Item("Nasty knife", "A blood covered big knife.", witch, 0, 2, M_WEAPON);
+	Item* knife = new Item("Knife", "A nasty, blood covered big knife.", witch, 0, 2, M_WEAPON);
 	knife->min_value = 2;
 	knife->max_value = 5;
 
-	Item* club = new Item("Great club", "Dangerous-looking club of great size.", troll, 0, 7, M_WEAPON);
+	Item* club = new Item("Greatclub", "Dangerous-looking club of great size.", troll, 0, 7, M_WEAPON);
 	club->min_value = 3;
 	club->max_value = 8;
 

@@ -79,6 +79,9 @@ bool Creature::Take(const vector<string>& args)
 		if(item == NULL) // Item can't be found
 			return false;
 
+		if (item->locked)
+			return false;
+
 		Item* subitem = (Item*)item->Find(args[3], ITEM); // Search Item inside Item
 
 		if(subitem == NULL) // Subitem not found
@@ -220,24 +223,41 @@ bool Creature::AutoEquip()
 // ----------------------------------------------------
 bool Creature::Lock(const vector<string>& args)
 {
-	/* Locks the specified Exit with an Item if it is the appropriate key. */
+	/* Locks the specified Item or Exit with an Item if it is the appropriate key. */
 	if(!IsAlive())
 		return false;
 
-	Exit* exit = GetRoom()->GetExit(args[1]);
+	Entity* lock;
+	auto lock_locked = [](Entity* e) { return (e->type == EXIT ? ((Exit*)e)->locked : ((Item*)e)->locked); };
+	auto lock_key = [](Entity* e) { return (e->type == EXIT ? ((Exit*)e)->key : ((Item*)e)->key); };
+	auto lock_name = [this](Entity* e) { return (e->type == EXIT ? ((Exit*)e)->GetNameFrom((Room*)parent) : ((Item*)e)->name); };
 
-	if(exit == NULL || exit->locked == true)
+	Exit* exit = GetRoom()->GetExit(args[1]);
+	
+	if (exit == NULL) {
+			Item* l_item = (Item*)GetRoom()->Find(args[1], ITEM);
+			if (l_item == NULL)
+				l_item = (Item*)Find(args[1], ITEM);
+			lock = l_item;
+			lock->type = ITEM;
+	}
+	else {
+		lock = exit;
+		lock->type = EXIT;
+	}
+
+	if (lock == NULL || lock_locked(lock))
 		return false;
 
 	Item* item = (Item*)Find(args[3], ITEM);
 
-	if(item == NULL || exit->key != item)
+	if(item == NULL || lock_key(lock) != item)
 		return false;
 
 	if(PlayerInRoom())
-		cout << "\n" << name << "locks " << exit->GetNameFrom((Room*)parent) << "...\n";
+		cout << "\n" << name << "locks " << lock_name(lock) << "...\n";
 
-	exit->locked = true;
+	(lock->type == EXIT ? ((Exit*)lock)->locked : ((Item*)lock)->locked) = true;
 
 	return true;
 }
@@ -249,20 +269,37 @@ bool Creature::UnLock(const vector<string>& args)
 	if(!IsAlive())
 		return false;
 
+	Entity* lock;
+	auto lock_locked = [](Entity* e) { return (e->type == EXIT ? ((Exit*)e)->locked : ((Item*)e)->locked); };
+	auto lock_key = [](Entity* e) { return (e->type == EXIT ? ((Exit*)e)->key : ((Item*)e)->key); };
+	auto lock_name = [this](Entity* e) { return (e->type == EXIT ? ((Exit*)e)->GetNameFrom((Room*)parent) : ((Item*)e)->name); };
+
 	Exit* exit = GetRoom()->GetExit(args[1]);
 
-	if(exit == NULL || exit->locked == false)
+	if (exit == NULL) {
+		Item* l_item = (Item*)GetRoom()->Find(args[1], ITEM);
+		if (l_item == NULL)
+			l_item = (Item*)Find(args[1], ITEM);
+		lock = l_item;
+		lock->type = ITEM;
+	}
+	else {
+		lock = exit;
+		lock->type = EXIT;
+	}
+
+	if (lock == NULL || lock_locked(lock)==false)
 		return false;
 
 	Item* item = (Item*)Find(args[3], ITEM);
 
-	if(item == NULL || exit->key != item)
+	if (item == NULL || lock_key(lock) != item)
 		return false;
 
-	if(PlayerInRoom())
-		cout << "\n" << name << "unlocks " << exit->GetNameFrom((Room*) parent) << "...\n";
+	if (PlayerInRoom())
+		cout << "\n" << name << "unlocks " << lock_name(lock) << "...\n";
 
-	exit->locked = false;
+	(lock->type == EXIT ? ((Exit*)lock)->locked : ((Item*)lock)->locked) = false;
 
 	return true;
 }
