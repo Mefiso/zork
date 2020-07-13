@@ -355,6 +355,10 @@ bool Player::Loot(const vector<string>& args)
 		for(list<Entity*>::const_iterator it = items.begin(); it != items.cend(); ++it)
 		{
 			Item* i = (Item*)(*it);
+			if(current_storage + i->item_size > capacity) {
+				cout << "\nCannot take any more items. Inventory is full.\n";
+				return false;
+			}
 			cout << "You find: " << i->name << "\n";
 			i->ChangeParentTo(this);
 		}
