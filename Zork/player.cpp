@@ -460,3 +460,7 @@ bool Player::UnLock(const vector<string>& args)
 
 void Player::Tick()
 {}
+
+void Player::Die() {
+	cout << "You die. You couldn't complete your quest and now you're dead.\n";
+}

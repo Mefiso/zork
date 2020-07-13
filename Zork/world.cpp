@@ -128,7 +128,7 @@ World::World()
 
 	// Player ----
 	player = new Player("Hero", "You are an awesome adventurer!", forest, 15);
-	player->hit_points = 25;
+	player->hit_points = 20;
 	player->min_damage = 0;
 	player->max_damage = 2;
 	entities.push_back(player);
@@ -303,4 +303,11 @@ bool World::ParseCommand(vector<string>& args)
 	}
 
 	return ret;
+}
+
+bool World::GameOver()
+{
+	if (player->hit_points <= 0)
+		return true;
+	return false;
 }

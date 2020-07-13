@@ -11,6 +11,7 @@ using namespace std;
 
 #define WHITE_ "\033[1;36m"
 #define _WHITE "\033[0m"
+#define RED_ "\033[1;31m"
 
 // -------------------------------------------------
 int main()
@@ -64,6 +65,9 @@ int main()
 		if(my_world.Tick(args) == false)
 			cout << "\nSorry, I do not understand your command.\n";
 
+		if (my_world.GameOver())
+			break;
+
 		if(args.size() > 0)
 		{
 			/* If there's still commands in args vector, deletes them. */
@@ -73,6 +77,10 @@ int main()
 		}
 	}
 
+	cout << RED_ "Game Over" _WHITE;
 	cout << "\nThanks for playing, Bye!\n";
-	return 0;
+	while (1) {
+		if (_kbhit != 0)
+			return 0;
+	}
 }

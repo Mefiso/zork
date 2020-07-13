@@ -24,6 +24,7 @@ public:
 	bool Lock(const vector<string>& args);
 	bool UnLock(const vector<string>& args);
 	void Tick();
+	void Die();
 
 public :
 
