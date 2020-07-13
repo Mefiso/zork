@@ -7,7 +7,7 @@
 
 // ----------------------------------------------------
 Room::Room(const char* title, const char* description) :
-Entity(title, description, NULL) // Rooms are not contained in any Entity
+Entity(title, description, numeric_limits<int>::infinity(), NULL) // Rooms are not contained in any Entity and have infinite capacity
 {
 	type = ROOM;
 }

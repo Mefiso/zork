@@ -12,7 +12,7 @@ using namespace std;
 class Creature : public Entity
 {
 public:
-	Creature(const char* name, const char* description, Room* room);
+	Creature(const char* name, const char* description, Room* room, const int capacity);
 	~Creature();
 
 	virtual bool Go(const vector<string>& args);

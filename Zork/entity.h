@@ -20,13 +20,13 @@ enum EntityType
 class Entity
 {
 public:
-	Entity(const char* name, const char* description, Entity* parent);
+	Entity(const char* name, const char* description, const int capacity, Entity* parent);
 	virtual ~Entity();
 
 	virtual void Look() const;
 	virtual void Tick();
 
-	void	ChangeParentTo(Entity* new_parent);
+	virtual void ChangeParentTo(Entity* new_parent);
 	bool    Find(Entity* entity) const;
 	Entity* Find(EntityType type) const;
 	Entity* Find(const string& name, EntityType type) const;
@@ -39,6 +39,8 @@ public :
 
 	Entity* parent;
 	list<Entity*> container;
+	int capacity;
+	int current_storage;
 };
 
 #endif //__Entity__

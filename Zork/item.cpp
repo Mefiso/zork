@@ -4,12 +4,16 @@
 #include "globals.h"
 #include "item.h"
 
+
 // ----------------------------------------------------
-Item::Item(const char* title, const char* description, Entity* parent, ItemType item_type) :
-Entity(title, description, parent), item_type(item_type)
+Item::Item(const char* title, const char* description, Entity* parent, const int capacity, const int size, ItemType item_type) :
+Entity(title, description, capacity, parent), item_type(item_type), item_size(size)
 {
 	type = ITEM;
 	min_value = max_value = 0; // sets min and max values to 0 by default
+
+	if (parent != NULL)
+		parent->current_storage += size;
 }
 
 // ----------------------------------------------------
@@ -31,6 +35,25 @@ void Item::Look() const
 		cout << "It contains: " << "\n";
 		for(list<Entity*>::const_iterator it = stuff.begin(); it != stuff.cend(); ++it)
 			cout << (*it)->name << "\n";
+	}
+}
+
+// ----------------------------------------------------
+void Item::ChangeParentTo(Entity* new_parent)
+{
+	/* Moves this Entity from its current container to the new one by removing from the contents
+	of the first and adding itself to te second */
+	
+	if (parent != NULL) {
+		parent->container.remove(this);
+		parent->current_storage -= item_size;
+	}
+
+	parent = new_parent;
+
+	if (parent != NULL) {
+		parent->container.push_back(this);
+		parent->current_storage += item_size;
 	}
 }
 

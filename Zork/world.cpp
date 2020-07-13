@@ -17,48 +17,120 @@ World::World()
 	Room* forest = new Room("Forest", "You are surrounded by tall trees. It feels like a huge forest someone could get lost easily.");
 	Room* house = new Room("House", "You are inside a beautiful but small white house.");
 	Room* basement = new Room("Basement", "The basement features old furniture and dim light.");
+	Room* beach = new Room("Beach", "You find yourself in a sandy shore. The beatiful blue sea extends before your eyes.");
+	Room* cemetery = new Room("Cemetery", "You are in a silent and gloomy graveyard in the middle of the forest.");
+	Room* hillside = new Room("Hillside", "A medium sized hill rises before you. The small amount of trees in this area let you see a cave on the slope.");
+	Room* hilltop = new Room("Hilltop", "Wind's howling. From the peak you can see the forest and the vast shore on the other side of the house.");
+	Room* cave = new Room("Cave", "You are in a cold, damp cavern. Almost no light enters this place.");
 
-	Exit* ex1 = new Exit("west", "east", "Little path", house, forest);
+	Exit* ex1 = new Exit("east", "west", "Little path", house, forest);
 	Exit* ex2 = new Exit("down", "up", "Stairs", house, basement);
-	ex2->locked = true;
+	Exit* ex3 = new Exit("westdoor", "east", "White wooden door.", house, beach);
+	Exit* ex4 = new Exit("south", "north", "Crooked trail.", forest, cemetery);
+	Exit* ex5 = new Exit("northwest", "southeast", "Old pathway.", forest, hillside);
+	Exit* ex6 = new Exit("up", "down", "Mountain route.", hillside, hilltop);
+	Exit* ex7 = new Exit("northeast", "outside", "Cave entrance.", hillside, cave);
+	ex3->locked = true;
 
 	entities.push_back(forest);
 	entities.push_back(house);
 	entities.push_back(basement);
+	entities.push_back(beach);
+	entities.push_back(cemetery);
+	entities.push_back(hillside);
+	entities.push_back(hilltop);
+	entities.push_back(cave);
 
 	entities.push_back(ex1);
 	entities.push_back(ex2);
+	entities.push_back(ex3);
+	entities.push_back(ex4);
+	entities.push_back(ex5);
+	entities.push_back(ex6);
+	entities.push_back(ex7);
 
 	// Creatures ----
-	Creature* butler = new Creature("Butler", "It's James, the house Butler.", house);
+	Creature* butler = new Creature("Butler", "It's James, the house Butler.", house, 8);
 	butler->hit_points = 10;
+	Creature* witch = new Creature("Witch", "It's the Witch of the Hill flying on its broomstick.", hilltop, 12);
+	witch->hit_points = 15;
+	witch->max_damage = 1;
+	witch->max_protection = 2;
+	Creature* troll = new Creature("Troll", "A cave troll. Seems aggresive.", cave, 18);
+	troll->hit_points = 23;
+	troll->min_damage = 3;
+	troll->max_damage = 4;
+	troll->min_protection = 3;
+	troll->max_protection = 5;
+	Creature* ghost = new Creature("Ghost", "It's a sorrowful wraith.", cemetery, 0);
+	ghost->hit_points = 10;
+	ghost->min_damage = 1;
+	ghost->max_damage = 3;
+	ghost->min_protection = ghost->max_protection = 7;
 
 	entities.push_back(butler);
+	entities.push_back(witch);
+	entities.push_back(troll);
+	entities.push_back(ghost);
 
 	// Items -----
-	Item* mailbox = new Item("Mailbox", "Looks like it might contain something.", house);
-	Item* key = new Item("Key", "Old iron key.", mailbox);
-	ex2->key = key;
+	Item* mailbox = new Item("Mailbox", "Looks like it might contain something.", house, 3, 3);
+	Item* key = new Item("Key", "Old iron key.", mailbox, 0, 1);
+	ex3->key = key;
+	Item* sack = new Item("Sack", "Brown old sack. Looks like it might contain something.", forest, 5, 4);
+	Item* apple = new Item("Apple", "A perfect red apple.", sack, 0, 1);
+	Item* crystal_ball = new Item("Crystal ball", "The witch's clairvoyant ball.", witch, 0, 2);
+	Item* chest = new Item("Small chest", "Wooden chest with iron lock.", cave, 4, 4);
+	Item* pouch = new Item("Pouch", "Pouch filled with gold pieces.", chest, 0, 2);
 
-	Item* sword = new Item("Sword", "A simple old and rusty sword.", forest, WEAPON);
+	// Weapons and armours --
+	Item* sword = new Item("Sword", "A simple old and rusty sword.", forest, 0, 4, WEAPON);
 	sword->min_value = 2;
 	sword->max_value = 6;
 
 	Item* sword2 = new Item(*sword);
 	sword2->ChangeParentTo(butler);
 
-	Item* shield = new Item("Shield", "An old wooden shield.", butler, ARMOUR);
+	Item* broom = new Item("Broomstick", "A crooked, old and dusty broomstick.", witch, 0, 6, WEAPON);
+	broom->min_value = 0;
+	broom->max_value = 3;
+
+	Item* knife = new Item("Nasty knife", "A blood covered big knife.", witch, 0, 2, WEAPON);
+	knife->min_value = 2;
+	knife->max_value = 5;
+
+	Item* club = new Item("Great club", "Dangerous-looking club of great size.", troll, 0, 7, WEAPON);
+	club->min_value = 3;
+	club->max_value = 8;
+
+	Item* shield = new Item("Shield", "An old wooden shield.", butler, 0, 5, ARMOUR);
 	shield->min_value = 1;
 	shield->max_value = 3;
+	
 	butler->AutoEquip();
+	witch->AutoEquip();
+	troll->AutoEquip();
 
+	entities.push_back(key);
 	entities.push_back(mailbox);
+	entities.push_back(sack);
+	entities.push_back(apple);
+	entities.push_back(crystal_ball);
+	entities.push_back(chest);
+	entities.push_back(pouch);
+	
 	entities.push_back(sword);
+	entities.push_back(sword2);
+	entities.push_back(broom);
+	entities.push_back(knife);
+	entities.push_back(club);
 	entities.push_back(shield);
 
 	// Player ----
-	player = new Player("Hero", "You are an awesome adventurer!", forest);
+	player = new Player("Hero", "You are an awesome adventurer!", forest, 15);
 	player->hit_points = 25;
+	player->min_damage = 0;
+	player->max_damage = 2;
 	entities.push_back(player);
 }
 
