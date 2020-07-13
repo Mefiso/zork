@@ -249,9 +249,13 @@ bool Player::Equip(const vector<string>& args)
 
 	switch(item->item_type)
 	{
-		case WEAPON:
+		case M_WEAPON:
 		weapon = item;
 		break;
+
+		case D_WEAPON:
+			weapon = item;
+			break;
 
 		case ARMOUR:
 		armour = item;

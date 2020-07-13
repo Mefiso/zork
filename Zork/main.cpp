@@ -77,10 +77,8 @@ int main()
 		}
 	}
 
-	cout << RED_ "Game Over" _WHITE;
+	cout << RED_ "\nGame Over\n" _WHITE;
 	cout << "\nThanks for playing, Bye!\n";
-	while (1) {
-		if (_kbhit != 0)
-			return 0;
-	}
+	system("pause");
+	return 0;
 }

@@ -45,6 +45,9 @@ public :
 	int max_damage;
 	int min_protection;
 	int max_protection;
+	int strength;
+	int intelligence;
+	int dexterity;
 	Creature* combat_target;
 	Item* weapon;
 	Item* armour;
