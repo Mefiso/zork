@@ -52,21 +52,28 @@ World::World()
 	// Creatures ----
 	Creature* butler = new Creature("Butler", "It's James, the house Butler.", house, 8);
 	butler->hit_points = 10;
+	butler->dexterity = 1;
+	butler->intelligence = 1;
 	Creature* witch = new Creature("Witch", "It's the Witch of the Hill flying on its broomstick.", hilltop, 12);
 	witch->hit_points = 15;
 	witch->max_damage = 1;
 	witch->max_protection = 2;
+	witch->intelligence = 3;
+	witch->dexterity = 2;
 	Creature* troll = new Creature("Troll", "A cave troll. Seems aggresive.", cave, 18);
 	troll->hit_points = 23;
-	troll->min_damage = 3;
+	troll->min_damage = 2;
 	troll->max_damage = 4;
 	troll->min_protection = 3;
 	troll->max_protection = 5;
+	troll->strength = 5;
 	Creature* ghost = new Creature("Ghost", "It's a sorrowful wraith.", cemetery, 0);
 	ghost->hit_points = 10;
 	ghost->min_damage = 1;
 	ghost->max_damage = 3;
 	ghost->min_protection = ghost->max_protection = 7;
+	ghost->intelligence = 2;
+	ghost->dexterity = 3;
 
 	entities.push_back(butler);
 	entities.push_back(witch);
@@ -84,22 +91,22 @@ World::World()
 	Item* pouch = new Item("Pouch", "Pouch filled with gold pieces.", chest, 0, 2);
 
 	// Weapons and armours --
-	Item* sword = new Item("Sword", "A simple old and rusty sword.", forest, 0, 4, WEAPON);
+	Item* sword = new Item("Sword", "A simple old and rusty sword.", forest, 0, 4, M_WEAPON);
 	sword->min_value = 2;
 	sword->max_value = 6;
 
 	Item* sword2 = new Item(*sword);
 	sword2->ChangeParentTo(butler);
 
-	Item* broom = new Item("Broomstick", "A crooked, old and dusty broomstick.", witch, 0, 6, WEAPON);
+	Item* broom = new Item("Broomstick", "A crooked, old and dusty broomstick.", witch, 0, 6, M_WEAPON);
 	broom->min_value = 0;
 	broom->max_value = 3;
 
-	Item* knife = new Item("Nasty knife", "A blood covered big knife.", witch, 0, 2, WEAPON);
+	Item* knife = new Item("Nasty knife", "A blood covered big knife.", witch, 0, 2, M_WEAPON);
 	knife->min_value = 2;
 	knife->max_value = 5;
 
-	Item* club = new Item("Great club", "Dangerous-looking club of great size.", troll, 0, 7, WEAPON);
+	Item* club = new Item("Great club", "Dangerous-looking club of great size.", troll, 0, 7, M_WEAPON);
 	club->min_value = 3;
 	club->max_value = 8;
 
@@ -128,9 +135,10 @@ World::World()
 
 	// Player ----
 	player = new Player("Hero", "You are an awesome adventurer!", forest, 15);
-	player->hit_points = 25;
-	player->min_damage = 0;
-	player->max_damage = 2;
+	player->hit_points = 20;
+	player->strength = 1;
+	player->dexterity = 2;
+	player->intelligence = 2;
 	entities.push_back(player);
 }
 
@@ -149,11 +157,10 @@ bool World::Tick(vector<string>& args)
 {
 	bool ret = true; // if there aren't commands in args, returns true
 
-	if(args.size() > 0 && args[0].length() > 0)
+	if (args.size() > 0 && args[0].length() > 0) {
 		ret = ParseCommand(args); // analize command in args
-
-	GameLoop();
-
+		GameLoop(); // World only ticks when a command is inputted
+	}
 	return ret;
 }
 
@@ -304,4 +311,11 @@ bool World::ParseCommand(vector<string>& args)
 	}
 
 	return ret;
+}
+
+bool World::GameOver()
+{
+	if (player->hit_points <= 0)
+		return true;
+	return false;
 }

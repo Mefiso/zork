@@ -12,6 +12,7 @@ Entity(title, description, capacity, (Entity*)room/*Where the Creature is, curre
 	type = CREATURE;
 	hit_points = 1;
 	min_damage = max_damage = min_protection = max_protection = 0;
+	strength = dexterity = intelligence = 0;
 	weapon = armour = NULL;
 	combat_target = NULL;
 }
@@ -145,9 +146,13 @@ bool Creature::Equip(const vector<string>& args)
 
 	switch(item->item_type)
 	{
-		case WEAPON:
+		case M_WEAPON:
 		weapon = item;
 		break;
+
+		case D_WEAPON:
+			weapon = item;
+			break;
 
 		case ARMOUR:
 		armour = item;
@@ -203,7 +208,7 @@ bool Creature::AutoEquip()
 	{
 		Item* i = (Item*)(*it);
 
-		if(i->item_type == WEAPON)
+		if(i->item_type == M_WEAPON || i->item_type == D_WEAPON)
 			weapon = i;
 		if(i->item_type == ARMOUR)
 			armour = i;
@@ -342,9 +347,13 @@ int Creature::MakeAttack()
 	}
 
 	int result = (weapon) ? weapon->GetValue() : Roll(min_damage, max_damage);
+	if (weapon)
+		result += (weapon->item_type == D_WEAPON) ? dexterity : strength;
+	else
+		result += strength;
 
 	if(PlayerInRoom())
-		cout << name << " attacks " << combat_target->name << " for " << result << "\n";
+		cout << "\n" << name << " attacks " << combat_target->name << " for " << result << "\n";
 
 	combat_target->ReceiveAttack(result);
 
@@ -360,12 +369,12 @@ int Creature::ReceiveAttack(int damage)
 {
 	/* Subtract as many hit points as damage surpasses Creature's armour */
 	int prot = (armour) ? armour->GetValue() : Roll(min_protection, max_protection);
-	int received = damage - prot;
+	int received = (damage - prot- dexterity/2)>0 ? damage-prot-dexterity/2 : 0;
 
 	hit_points -= received;
 
 	if(PlayerInRoom())
-		cout << name << " is hit for " << received << " damage (" << prot << " blocked) \n";
+		cout << name << " is hit for " << received << " damage (" << prot << " blocked, " << dexterity/2 << " dodged) \n";
 
 	if(IsAlive() == false)
 		Die();
@@ -417,5 +426,8 @@ void Creature::Stats() const
 	cout << ((weapon) ? weapon->min_value : min_damage) << "-" << ((weapon) ? weapon->max_value : max_damage);
 	cout << "\nProtection: (" << ((armour) ? armour->name : "no armour") << ") ";
 	cout << ((armour) ? armour->min_value : min_protection) << "-" << ((armour) ? armour->max_value : max_protection);
+	cout << "\nStrength: " << strength;
+	cout << "\nDexterity: " << dexterity;
+	cout << "\nIntelligence: " << intelligence;
 	cout << "\n";
 }

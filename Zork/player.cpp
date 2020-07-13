@@ -249,9 +249,13 @@ bool Player::Equip(const vector<string>& args)
 
 	switch(item->item_type)
 	{
-		case WEAPON:
+		case M_WEAPON:
 		weapon = item;
 		break;
+
+		case D_WEAPON:
+			weapon = item;
+			break;
 
 		case ARMOUR:
 		armour = item;
@@ -329,7 +333,8 @@ bool Player::Attack(const vector<string>& args)
 	}
 
 	combat_target = target;
-	cout << "\nYou jump to attack " << target->name << "!\n";
+	cout << "\nYou attack " << target->name << "!\n";
+	MakeAttack();
 	return true;
 }
 
@@ -455,4 +460,11 @@ bool Player::UnLock(const vector<string>& args)
 	exit->locked = false;
 
 	return true;
+}
+
+void Player::Tick()
+{}
+
+void Player::Die() {
+	cout << "You die. You couldn't complete your quest and now you're dead.\n";
 }
