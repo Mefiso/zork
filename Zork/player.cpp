@@ -190,6 +190,9 @@ bool Player::Drop(const vector<string>& args)
 			return false;
 		}
 
+		if (item == weapon || item == armour)
+			UnEquip(args);
+	
 		cout << "\nYou drop " << item->name << "...\n";
 		item->ChangeParentTo(parent);
 
@@ -220,6 +223,9 @@ bool Player::Drop(const vector<string>& args)
 			cout << "\nCannot put " << item->name << " into " << container->name << ".\n";
 			return false;
 		}
+
+		if (item == weapon || item == armour)
+			UnEquip(args);
 		cout << "\nYou put " << item->name << " into " << container->name << ".\n";
 		item->ChangeParentTo(container);
 

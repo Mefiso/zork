@@ -277,6 +277,8 @@ bool Creature::Drop(const vector<string>& args)
 	if(PlayerInRoom())
 		cout << "\n" << name << " drops " << item->name << "...\n";
 	
+	if (item == weapon || item == armour)
+		UnEquip(args);
 	item->ChangeParentTo(parent);
 
 	return true;
