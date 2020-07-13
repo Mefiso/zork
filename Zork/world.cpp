@@ -149,11 +149,10 @@ bool World::Tick(vector<string>& args)
 {
 	bool ret = true; // if there aren't commands in args, returns true
 
-	if(args.size() > 0 && args[0].length() > 0)
+	if (args.size() > 0 && args[0].length() > 0) {
 		ret = ParseCommand(args); // analize command in args
-
-	GameLoop();
-
+		GameLoop(); // World only ticks when a command is inputted
+	}
 	return ret;
 }
 

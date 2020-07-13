@@ -344,7 +344,7 @@ int Creature::MakeAttack()
 	int result = (weapon) ? weapon->GetValue() : Roll(min_damage, max_damage);
 
 	if(PlayerInRoom())
-		cout << name << " attacks " << combat_target->name << " for " << result << "\n";
+		cout << "\n" << name << " attacks " << combat_target->name << " for " << result << "\n";
 
 	combat_target->ReceiveAttack(result);
 
@@ -360,7 +360,7 @@ int Creature::ReceiveAttack(int damage)
 {
 	/* Subtract as many hit points as damage surpasses Creature's armour */
 	int prot = (armour) ? armour->GetValue() : Roll(min_protection, max_protection);
-	int received = damage - prot;
+	int received = (damage - prot)>0 ? damage-prot : 0;
 
 	hit_points -= received;
 

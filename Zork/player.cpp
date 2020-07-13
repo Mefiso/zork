@@ -329,7 +329,8 @@ bool Player::Attack(const vector<string>& args)
 	}
 
 	combat_target = target;
-	cout << "\nYou jump to attack " << target->name << "!\n";
+	cout << "\nYou attack " << target->name << "!\n";
+	MakeAttack();
 	return true;
 }
 
@@ -456,3 +457,6 @@ bool Player::UnLock(const vector<string>& args)
 
 	return true;
 }
+
+void Player::Tick()
+{}
