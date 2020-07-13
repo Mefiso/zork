@@ -20,7 +20,7 @@ int main()
 	vector<string> args;
 	args.reserve(10);
 
-	cout << WHITE_ "Welcome to MyZork!\n" _WHITE;
+	cout << WHITE_ << "Welcome to MyZork!\n" << _WHITE;
 	cout << "----------------\n";
 
 	World my_world;
