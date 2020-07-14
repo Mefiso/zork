@@ -98,10 +98,10 @@ bool Player::Take(const vector<string>& args)
 {
 	/* Tries to pick the specified object either from the Room or from another Item in eithe the 
 	inventory or the current Room. */
-	
+	Item* item;
 	if(args.size() == 4) // For subitems inside items
 	{
-		Item* item = (Item*)parent->Find(args[3], ITEM); // From Room
+		item = (Item*)parent->Find(args[3], ITEM); // From Room
 
 		// we could pick something from a container in our inventory ...
 		if(item == NULL)
@@ -131,10 +131,11 @@ bool Player::Take(const vector<string>& args)
 		}
 		cout << "\nYou take " << subitem->name << " from " << item->name << ".\n";
 		subitem->ChangeParentTo(this); // Moves to root inventory.
+		item = subitem;
 	}
 	else if(args.size() == 2) // For items in room
 	{
-		Item* item = (Item*)parent->Find(args[1], ITEM);
+		item = (Item*)parent->Find(args[1], ITEM);
 
 		if(item == NULL || item->hidden)
 		{
@@ -150,7 +151,12 @@ bool Player::Take(const vector<string>& args)
 		item->ChangeParentTo(this);
 	}
 
-	return false;
+	if (item->hiding != NULL) {
+		cout << item->move_description << "\n";
+		((item->hiding)->type == EXIT ? ((Exit*)item->hiding)->hidden : ((Item*)item->hiding)->hidden) = false;
+		item->hiding = NULL;
+	}
+	return true;
 }
 
 // ----------------------------------------------------
@@ -543,8 +549,7 @@ bool Player::Move(const vector<string>& args)
 	}
 
 	cout << "\nYou move " << item->name << " aside.\n";
-	if (((Exit*)item->hiding)->hidden)
-		cout << "GG";
+	
 	if (item->hiding == NULL)
 		return false;
 	cout << item->move_description << "\n";

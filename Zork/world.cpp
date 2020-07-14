@@ -110,7 +110,7 @@ World::World()
 	wardrobe->move_description = "On the wall behind where the wardrobe was, a mysterious door is revealed.";
 	Item* rock = new Item("Rock", "Huge heavy rock.", cave, 0, 7);
 	rock->hiding = ex9;
-	rock->move_description = "It appears a secret passage that goes up, deeper in the cavern.";
+	rock->move_description = "On the wall behind, it appears a secret passage that goes up, deeper in the cavern.";
 
 	// Weapons and armours --
 	Item* sword = new Item("Sword", "A simple old and rusty sword.", forest, 0, 4, M_WEAPON);
@@ -160,7 +160,7 @@ World::World()
 	entities.push_back(shield);
 
 	// Player ----
-	player = new Player("Hero", "You are an awesome adventurer!", basement, 15);
+	player = new Player("Hero", "You are an awesome adventurer!", cave, 15);
 	player->hit_points = 20;
 	player->strength = 1;
 	player->dexterity = 2;
