@@ -125,8 +125,8 @@ bool Player::Take(const vector<string>& args)
 			return false;
 		}
 
-		if(current_storage + subitem->item_size > capacity) {
-			cout << "\nCannot take " << subitem->name << ". Inventory is full.\n";
+		if(current_storage + subitem->item_size > capacity || !subitem->takeable) {
+			cout << "\nCannot take " << subitem->name << ((subitem->takeable) ? ". Inventory is full.\n" : ". It's too heavy to carry.\n");
 			return false;
 		}
 		cout << "\nYou take " << subitem->name << " from " << item->name << ".\n";
@@ -142,8 +142,8 @@ bool Player::Take(const vector<string>& args)
 			return false;
 		}
 
-		if (current_storage + item->item_size > capacity) {
-			cout << "\nCannot take " << item->name << ". Inventory is full.\n";
+		if (current_storage + item->item_size > capacity || !item->takeable) {
+			cout << "\nCannot take " << item->name << ((item->takeable) ? ". Inventory is full.\n" : ". It's too heavy to carry.\n");
 			return false;
 		}
 		cout << "\nYou take " << item->name << ".\n";

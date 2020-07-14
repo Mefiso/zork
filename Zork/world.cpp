@@ -105,7 +105,7 @@ World::World()
 	chest->key = black_key;
 	Item* gold_key = new Item("Bronze-key", "A clean and nice bronze key.", basement, 0, 1);
 	ex8->key = gold_key;
-	Item* wardrobe = new Item("Wardrobe", "Old oak wooden wardrobe with double door.", basement, 14, 14);
+	Item* wardrobe = new Item("Wardrobe", "Old oak wooden wardrobe with double door.", basement, 14, 14, false);
 	wardrobe->hiding = ex8;
 	wardrobe->move_description = "On the wall behind where the wardrobe was, a mysterious door is revealed.";
 	Item* rock = new Item("Rock", "Huge heavy rock.", cave, 0, 7);
