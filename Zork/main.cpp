@@ -13,6 +13,37 @@ using namespace std;
 #define _WHITE "\033[0m"
 #define RED_ "\033[1;31m"
 
+bool introduction() {
+	cout << "\nYou are dead.\nThe darkness surrounds you, and you feel cold despite not being alive.";
+	cout << "\nYou cannot move, cannot speak. You are not breathing. Still, you feel...\nYou feel pain, you feel sorrow, and you feel cold.\n"
+		"Why can you feel, you wonder...\n\n";
+	system("pause");
+	cout << "\nSomething moved out there. You can't see, but you sensed it...\n"
+		"Suddenly, a voice! A smooth, whispering, yet clear voice: \n"
+		"'How does it feel, being dead?'- asks...\n'Oh! I am sorry, you can't speak.'- the voice direcly speaking to your mind. - 'Let me fix this.'\n"
+		"\nYou gasp abruptly. There isn't absolute darkness now, but neither an specific source of light.\nAt some point in the space before your eyes"
+		" (you can't really tell the distance) there's a reddish humanoid figure sitting on a dark grey throne with yellowish white things stuck in it... Bones?\n\n";
+	system("pause");
+	cout << "\n'H...H-Hello?' - you manage to say in a thin voice. A shiver goes down your spine and you feel heavy.\n";
+	cout << "\n'Let me introduce myself. I am Mephistopheles, the Prince of Hell.' -says the figure. Another shiver... -'You are here because I need something.'\n"
+		"...\n\n'I need something that you may be able to acquire. So I will offer you a Deal.'\n\n You are out of words, you try asking something but your voice does not"
+		" come out. The mysterious being who claims to be a prince of Hell proceeds:\n'Three items where stolen from Hell. MY items.'- Mephistopheles rises one hand.\n"
+		"'Three powerful magical objects that I created, the so called Trident of Mephistopheles:'\n\n";
+	system("pause");
+	cout << "\n'The first spike, The Purple Eye.'- an image appears in your mind - 'The second spike, Mephistopheles's Fire. And finally, The Black Third'- more images fill your"
+		"mind as it speaks. 'I need them back.'\n\nYou stutter -'I-I don...'\n'The Trident is in the realm of mortals. The deal is the following: I am resurrecting you,"
+		" so that you find the spikes and bring them to me. Do you accept the Contract? \n[Yes/No]\n\n";
+	cout << ">";
+	
+	string answer;
+	cin >> answer;
+	
+	if (Same(answer, "yes"))
+		return true;
+	else
+		return false;
+}
+
 // -------------------------------------------------
 int main()
 {
@@ -21,60 +52,63 @@ int main()
 	vector<string> args;
 	args.reserve(10);
 
-	cout << WHITE_ << "Welcome to MyZork!\n" << _WHITE;
+	cout << WHITE_ << "Welcome to MephisZorkpheles!\n" << _WHITE;
 	cout << "----------------\n";
 
 	World my_world;
 
-	
-	args.push_back("look"); // In order to print presentation when starting game
+	if (introduction()) {
+		system("pause");
+		cout << "\nYou wake up in a... ";
+		args.push_back("look"); // In order to print presentation when starting game
 
-	while(1)
-	{
-		if(_kbhit() != 0) // if something in buffer
+		while (1)
 		{
-			key = _getch();
-			if(key == '\b') // backspace
+			if (_kbhit() != 0) // if something in buffer
 			{
-				if(player_input.length() > 0)
+				key = _getch();
+				if (key == '\b') // backspace
 				{
-					player_input.pop_back();
-					//cout << BACKSPACE;
-					cout << '\b';
-					cout << " ";
-					cout << '\b';
+					if (player_input.length() > 0)
+					{
+						player_input.pop_back();
+						//cout << BACKSPACE;
+						cout << '\b';
+						cout << " ";
+						cout << '\b';
+					}
 				}
+				else if (key != '\r') // return
+				{
+					/* Adds char to the input */
+					player_input += key;
+					cout << key;
+				}
+				else
+					/* Identifies each word in input and adds each as an
+					args vector element */
+					Tokenize(player_input, args);
 			}
-			else if(key != '\r') // return
+
+			if (args.size() > 0 && Same(args[0], "quit"))
+				/* if the command in args is quit, exits the game */
+				break;
+
+			/* Ticks the world and analizes args in case there's any command.
+			Only returning false when a command is not recognized. */
+			if (my_world.Tick(args) == false)
+				cout << "\nSorry, I do not understand your command.\n";
+
+			if (my_world.GameOver())
+				break;
+
+			if (args.size() > 0)
 			{
-				/* Adds char to the input */
-				player_input += key;
-				cout << key;
+				/* If there's still commands in args vector, deletes them. */
+				args.clear();
+				player_input = "";
+				cout << "\n> ";
 			}
-			else
-				/* Identifies each word in input and adds each as an 
-				args vector element */
-				Tokenize(player_input, args);
-		}
-
-		if(args.size() > 0 && Same(args[0], "quit"))
-			/* if the command in args is quit, exits the game */
-			break;
-		
-		/* Ticks the world and analizes args in case there's any command. 
-		Only returning false when a command is not recognized. */
-		if(my_world.Tick(args) == false)
-			cout << "\nSorry, I do not understand your command.\n";
-
-		if (my_world.GameOver())
-			break;
-
-		if(args.size() > 0)
-		{
-			/* If there's still commands in args vector, deletes them. */
-			args.clear();
-			player_input = "";
-			cout << "\n> ";
 		}
 	}
 
