@@ -33,6 +33,9 @@ public :
 	int item_size;
 	bool locked;
 	Entity* key;
+	bool hidden;
+	Entity* hiding;
+	std::string move_description;
 
 };
 

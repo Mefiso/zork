@@ -26,6 +26,7 @@ int main()
 
 	World my_world;
 
+	
 	args.push_back("look"); // In order to print presentation when starting game
 
 	while(1)
@@ -59,7 +60,7 @@ int main()
 		if(args.size() > 0 && Same(args[0], "quit"))
 			/* if the command in args is quit, exits the game */
 			break;
-
+		
 		/* Ticks the world and analizes args in case there's any command. 
 		Only returning false when a command is not recognized. */
 		if(my_world.Tick(args) == false)

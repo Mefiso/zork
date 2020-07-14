@@ -22,6 +22,8 @@ World::World()
 	Room* hillside = new Room("Hillside", "A medium sized hill rises before you. The small amount of trees in this area let you see a cave on the slope.");
 	Room* hilltop = new Room("Hilltop", "Wind's howling. From the peak you can see the forest and the vast shore on the other side of the house.");
 	Room* cave = new Room("Cave", "You are in a cold, damp cavern. Almost no light enters this place.");
+	Room* secret_lab = new Room("Laboratory", "The secret laboratory of an alchemist. Crysal pipes, flasks, liquids and fumes all over the place.");
+	Room* treasure_room = new Room("Grotto", "You enter deeper in the cave. Here the high ceiling is open and you can see the sky.");
 
 	Exit* ex1 = new Exit("east", "west", "Little path", house, forest);
 	Exit* ex2 = new Exit("down", "up", "Stairs", house, basement);
@@ -30,7 +32,12 @@ World::World()
 	Exit* ex5 = new Exit("northwest", "southeast", "Old pathway.", forest, hillside);
 	Exit* ex6 = new Exit("up", "down", "Mountain route.", hillside, hilltop);
 	Exit* ex7 = new Exit("northeast", "outside", "Cave entrance.", hillside, cave);
+	Exit* ex8 = new Exit("west", "east", "A metal door.", basement, secret_lab);
+	Exit* ex9 = new Exit("up", "down", "A secret passage communicates two levels of the cavern.", cave, treasure_room);
 	ex3->locked = true;
+	ex8->locked = true;
+	ex8->hidden = true;
+	ex9->hidden = true;
 
 	entities.push_back(forest);
 	entities.push_back(house);
@@ -40,6 +47,8 @@ World::World()
 	entities.push_back(hillside);
 	entities.push_back(hilltop);
 	entities.push_back(cave);
+	entities.push_back(secret_lab);
+	entities.push_back(treasure_room);
 
 	entities.push_back(ex1);
 	entities.push_back(ex2);
@@ -48,6 +57,8 @@ World::World()
 	entities.push_back(ex5);
 	entities.push_back(ex6);
 	entities.push_back(ex7);
+	entities.push_back(ex8);
+	entities.push_back(ex9);
 
 	// Creatures ----
 	Creature* butler = new Creature("Butler", "It's James, the house Butler.", house, 8);
@@ -87,11 +98,19 @@ World::World()
 	Item* sack = new Item("Sack", "Brown old sack. Looks like it might contain something.", forest, 5, 4);
 	Item* apple = new Item("Apple", "A perfect red apple.", sack, 0, 1);
 	Item* crystal_ball = new Item("Palantír", "The witch's clairvoyant ball.", witch, 0, 2);
-	Item* chest = new Item("Chest", "Wooden small chest with iron lock.", cave, 4, 4);
+	Item* chest = new Item("Chest", "Wooden small chest with iron lock.", cave, 4, 3);
 	chest->locked = true;
 	Item* pouch = new Item("Pouch", "Pouch filled with gold pieces.", chest, 0, 2);
 	Item* black_key = new Item("Black-key", "A black iron key.", witch, 0, 1);
 	chest->key = black_key;
+	Item* gold_key = new Item("Bronze-key", "A clean and nice bronze key.", basement, 0, 1);
+	ex8->key = gold_key;
+	Item* wardrobe = new Item("Wardrobe", "Old oak wooden wardrobe with double door.", basement, 14, 14);
+	wardrobe->hiding = ex8;
+	wardrobe->move_description = "On the wall behind where the wardrobe was, a mysterious door is revealed.";
+	Item* rock = new Item("Rock", "Huge heavy rock.", cave, 0, 7);
+	rock->hiding = ex9;
+	rock->move_description = "It appears a secret passage that goes up, deeper in the cavern.";
 
 	// Weapons and armours --
 	Item* sword = new Item("Sword", "A simple old and rusty sword.", forest, 0, 4, M_WEAPON);
@@ -128,6 +147,10 @@ World::World()
 	entities.push_back(crystal_ball);
 	entities.push_back(chest);
 	entities.push_back(pouch);
+	entities.push_back(black_key);
+	entities.push_back(gold_key);
+	entities.push_back(wardrobe);
+	entities.push_back(rock);
 	
 	entities.push_back(sword);
 	entities.push_back(sword2);
@@ -137,7 +160,7 @@ World::World()
 	entities.push_back(shield);
 
 	// Player ----
-	player = new Player("Hero", "You are an awesome adventurer!", forest, 15);
+	player = new Player("Hero", "You are an awesome adventurer!", basement, 15);
 	player->hit_points = 20;
 	player->strength = 1;
 	player->dexterity = 2;
@@ -278,6 +301,10 @@ bool World::ParseCommand(vector<string>& args)
 			else if(Same(args[0], "loot") || Same(args[0], "lt"))
 			{
 				player->Loot(args);
+			}
+			else if (Same(args[0], "move") || Same(args[0], "mv"))
+			{
+				player->Move(args);
 			}
 			else
 				ret = false;

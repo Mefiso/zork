@@ -5,6 +5,10 @@
 #include "item.h"
 #include "creature.h"
 
+/* Note: Creatures other than Player are not affected by hidden objects or exits, they can take
+or use them. That is because the hidden state of those Entities represents only their visibility
+w.r.t. the player. */
+
 // ----------------------------------------------------
 Creature::Creature(const char* title, const char* description, Room* room, const int capacity) :
 Entity(title, description, capacity, (Entity*)room/*Where the Creature is, currently*/)
@@ -47,7 +51,7 @@ bool Creature::Go(const vector<string>& args)
 
 	Exit* exit = GetRoom()->GetExit(args[1]);
 
-	if(exit == NULL)
+	if(exit == NULL) // Creatures other than player can move throughexits even if hidden
 		return false;
 
 	if(PlayerInRoom()) 
@@ -76,10 +80,7 @@ bool Creature::Take(const vector<string>& args)
 		if(item == NULL)
 			item = (Item*)Find(args[1], ITEM);
 
-		if(item == NULL) // Item can't be found
-			return false;
-
-		if (item->locked)
+		if(item == NULL || item->locked) // Item can't be found or opened up
 			return false;
 
 		Item* subitem = (Item*)item->Find(args[3], ITEM); // Search Item inside Item
@@ -93,7 +94,7 @@ bool Creature::Take(const vector<string>& args)
 		item = subitem;
 	}
 
-	if(item == NULL) // Item not found
+	if(item == NULL || item->locked) // Item not found or locked
 		return false;
 
 	if(current_storage + item->item_size > capacity) {

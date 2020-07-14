@@ -23,6 +23,7 @@ public :
 	bool one_way;
 	bool closed;
 	bool locked;
+	bool hidden;
 	string opposite_name;
 	Room* destination;
 	Entity* key;

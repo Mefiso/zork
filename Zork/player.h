@@ -25,6 +25,7 @@ public:
 	bool UnLock(const vector<string>& args);
 	void Tick();
 	void Die();
+	bool Move(const vector<string>& args);
 
 public :
 
