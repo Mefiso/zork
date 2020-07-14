@@ -5,6 +5,10 @@
 #include "item.h"
 #include "creature.h"
 
+/* Note: Creatures other than Player are not affected by hidden objects or exits, they can take
+or use them. That is because the hidden state of those Entities represents only their visibility
+w.r.t. the player. */
+
 // ----------------------------------------------------
 Creature::Creature(const char* title, const char* description, Room* room, const int capacity) :
 Entity(title, description, capacity, (Entity*)room/*Where the Creature is, currently*/)
@@ -47,7 +51,7 @@ bool Creature::Go(const vector<string>& args)
 
 	Exit* exit = GetRoom()->GetExit(args[1]);
 
-	if(exit == NULL)
+	if(exit == NULL) // Creatures other than player can move throughexits even if hidden
 		return false;
 
 	if(PlayerInRoom()) 
@@ -76,7 +80,7 @@ bool Creature::Take(const vector<string>& args)
 		if(item == NULL)
 			item = (Item*)Find(args[1], ITEM);
 
-		if(item == NULL) // Item can't be found
+		if(item == NULL || item->locked) // Item can't be found or opened up
 			return false;
 
 		Item* subitem = (Item*)item->Find(args[3], ITEM); // Search Item inside Item
@@ -90,7 +94,7 @@ bool Creature::Take(const vector<string>& args)
 		item = subitem;
 	}
 
-	if(item == NULL) // Item not found
+	if(item == NULL || item->locked) // Item not found or locked
 		return false;
 
 	if(current_storage + item->item_size > capacity) {
@@ -220,24 +224,41 @@ bool Creature::AutoEquip()
 // ----------------------------------------------------
 bool Creature::Lock(const vector<string>& args)
 {
-	/* Locks the specified Exit with an Item if it is the appropriate key. */
+	/* Locks the specified Item or Exit with an Item if it is the appropriate key. */
 	if(!IsAlive())
 		return false;
 
-	Exit* exit = GetRoom()->GetExit(args[1]);
+	Entity* lock;
+	auto lock_locked = [](Entity* e) { return (e->type == EXIT ? ((Exit*)e)->locked : ((Item*)e)->locked); };
+	auto lock_key = [](Entity* e) { return (e->type == EXIT ? ((Exit*)e)->key : ((Item*)e)->key); };
+	auto lock_name = [this](Entity* e) { return (e->type == EXIT ? ((Exit*)e)->GetNameFrom((Room*)parent) : ((Item*)e)->name); };
 
-	if(exit == NULL || exit->locked == true)
+	Exit* exit = GetRoom()->GetExit(args[1]);
+	
+	if (exit == NULL) {
+			Item* l_item = (Item*)GetRoom()->Find(args[1], ITEM);
+			if (l_item == NULL)
+				l_item = (Item*)Find(args[1], ITEM);
+			lock = l_item;
+			lock->type = ITEM;
+	}
+	else {
+		lock = exit;
+		lock->type = EXIT;
+	}
+
+	if (lock == NULL || lock_locked(lock))
 		return false;
 
 	Item* item = (Item*)Find(args[3], ITEM);
 
-	if(item == NULL || exit->key != item)
+	if(item == NULL || lock_key(lock) != item)
 		return false;
 
 	if(PlayerInRoom())
-		cout << "\n" << name << "locks " << exit->GetNameFrom((Room*)parent) << "...\n";
+		cout << "\n" << name << "locks " << lock_name(lock) << "...\n";
 
-	exit->locked = true;
+	(lock->type == EXIT ? ((Exit*)lock)->locked : ((Item*)lock)->locked) = true;
 
 	return true;
 }
@@ -249,20 +270,37 @@ bool Creature::UnLock(const vector<string>& args)
 	if(!IsAlive())
 		return false;
 
+	Entity* lock;
+	auto lock_locked = [](Entity* e) { return (e->type == EXIT ? ((Exit*)e)->locked : ((Item*)e)->locked); };
+	auto lock_key = [](Entity* e) { return (e->type == EXIT ? ((Exit*)e)->key : ((Item*)e)->key); };
+	auto lock_name = [this](Entity* e) { return (e->type == EXIT ? ((Exit*)e)->GetNameFrom((Room*)parent) : ((Item*)e)->name); };
+
 	Exit* exit = GetRoom()->GetExit(args[1]);
 
-	if(exit == NULL || exit->locked == false)
+	if (exit == NULL) {
+		Item* l_item = (Item*)GetRoom()->Find(args[1], ITEM);
+		if (l_item == NULL)
+			l_item = (Item*)Find(args[1], ITEM);
+		lock = l_item;
+		lock->type = ITEM;
+	}
+	else {
+		lock = exit;
+		lock->type = EXIT;
+	}
+
+	if (lock == NULL || lock_locked(lock)==false)
 		return false;
 
 	Item* item = (Item*)Find(args[3], ITEM);
 
-	if(item == NULL || exit->key != item)
+	if (item == NULL || lock_key(lock) != item)
 		return false;
 
-	if(PlayerInRoom())
-		cout << "\n" << name << "unlocks " << exit->GetNameFrom((Room*) parent) << "...\n";
+	if (PlayerInRoom())
+		cout << "\n" << name << "unlocks " << lock_name(lock) << "...\n";
 
-	exit->locked = false;
+	(lock->type == EXIT ? ((Exit*)lock)->locked : ((Item*)lock)->locked) = false;
 
 	return true;
 }
@@ -404,7 +442,7 @@ bool Creature::Loot(const vector<string>& args)
 	for(list<Entity*>::const_iterator it = items.begin(); it != items.cend(); ++it)
 	{
 		Item* i = (Item*)(*it);
-		if (current_storage + i->item_size > capacity) {
+		if (current_storage + i->item_size > capacity || !i->takeable) {
 			if (PlayerInRoom())
 				cout << "\n" << name << " cannot take any more objects.\n";
 			return false;

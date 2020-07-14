@@ -29,8 +29,19 @@ void Player::Look(const vector<string>& args) const
 		{
 			if(Same((*it)->name, args[1]) || ((*it)->type == EXIT && Same(args[1], ((Exit*)(*it))->GetNameFrom((Room*)parent))))
 			{
-				(*it)->Look();
-				return;
+				switch ((*it)->type)
+				{
+				case ITEM:
+					if (((Item*)(*it))->hidden)
+						return;
+				case EXIT:
+					if (((Exit*)(*it))->hidden)
+						return;
+				default:
+					(*it)->Look();
+					return;
+				}
+				
 			}
 		}
 		
@@ -62,7 +73,7 @@ bool Player::Go(const vector<string>& args)
 	/* Moves the player through the specified Exit if possible */
 	Exit* exit = GetRoom()->GetExit(args[1]);
 
-	if(exit == NULL)
+	if(exit == NULL || exit->hidden)
 	{
 		cout << "\nThere is no exit at '" << args[1] << "'.\n";
 		return false;
@@ -87,21 +98,25 @@ bool Player::Take(const vector<string>& args)
 {
 	/* Tries to pick the specified object either from the Room or from another Item in eithe the 
 	inventory or the current Room. */
-	
+	Item* item;
 	if(args.size() == 4) // For subitems inside items
 	{
-		Item* item = (Item*)parent->Find(args[3], ITEM); // From Room
+		item = (Item*)parent->Find(args[3], ITEM); // From Room
 
 		// we could pick something from a container in our inventory ...
 		if(item == NULL)
 			item = (Item*)Find(args[3], ITEM); // From inventory
 
-		if(item == NULL)
+		if(item == NULL || item->hidden)
 		{
 			cout << "\nCannot find '" << args[3] << "' in this room or in your inventory.\n";
 			return false;
 		}
 
+		if (item->locked) {
+			cout << "\n" << item->name << " is locked.\n";
+			return false;
+		}
 		Item* subitem = (Item*)item->Find(args[1], ITEM); // Item inside another
 
 		if(subitem == NULL)
@@ -110,32 +125,38 @@ bool Player::Take(const vector<string>& args)
 			return false;
 		}
 
-		if(current_storage + subitem->item_size > capacity) {
-			cout << "\nCannot take " << subitem->name << ". Inventory is full.\n";
+		if(current_storage + subitem->item_size > capacity || !subitem->takeable) {
+			cout << "\nCannot take " << subitem->name << ((subitem->takeable) ? ". Inventory is full.\n" : ". It's too heavy to carry.\n");
 			return false;
 		}
 		cout << "\nYou take " << subitem->name << " from " << item->name << ".\n";
 		subitem->ChangeParentTo(this); // Moves to root inventory.
+		item = subitem;
 	}
 	else if(args.size() == 2) // For items in room
 	{
-		Item* item = (Item*)parent->Find(args[1], ITEM);
+		item = (Item*)parent->Find(args[1], ITEM);
 
-		if(item == NULL)
+		if(item == NULL || item->hidden)
 		{
 			cout << "\nThere is no item here with that name.\n";
 			return false;
 		}
 
-		if (current_storage + item->item_size > capacity) {
-			cout << "\nCannot take " << item->name << ". Inventory is full.\n";
+		if (current_storage + item->item_size > capacity || !item->takeable) {
+			cout << "\nCannot take " << item->name << ((item->takeable) ? ". Inventory is full.\n" : ". It's too heavy to carry.\n");
 			return false;
 		}
 		cout << "\nYou take " << item->name << ".\n";
 		item->ChangeParentTo(this);
 	}
 
-	return false;
+	if (item->hiding != NULL) {
+		cout << item->move_description << "\n";
+		((item->hiding)->type == EXIT ? ((Exit*)item->hiding)->hidden : ((Item*)item->hiding)->hidden) = false;
+		item->hiding = NULL;
+	}
+	return true;
 }
 
 // ----------------------------------------------------
@@ -162,7 +183,7 @@ void Player::Inventory() const
 			list<Entity*> stuff;
 			(*it)->FindAll(ITEM, stuff);
 
-			if (stuff.size() > 0) { // If an item contains more inside, list them.
+			if (stuff.size() > 0 && ((Item*)(*it))->locked == false) { // If an item contains more inside, list them.
 				cout << " containing ";
 				for (list<Entity*>::const_iterator it2 = stuff.begin(); it2 != stuff.cend(); ++it2)
 					cout << (*it2)->name << ", ";
@@ -213,10 +234,19 @@ bool Player::Drop(const vector<string>& args)
 		if(container == NULL)
 		{
 			container = (Item*)Find(args[3], ITEM);
-			if (container == NULL) {
+			if (container == NULL || container->hidden) {
 				cout << "\nCan not find '" << args[3] << "' in your inventory or in the room.\n";
 				return false;
 			}
+		}
+		else if(container->hidden) {
+			cout << "\nCan not find '" << args[3] << "' in your inventory or in the room.\n";
+			return false;
+		}
+
+		if (container->locked) { // Check if container locked
+			cout << container->name << " is locked. Can't open it to put something inside.\n";
+			return false;
 		}
 
 		if(container->current_storage + item->item_size > container->capacity) {
@@ -385,38 +415,61 @@ bool Player::Lock(const vector<string>& args)
 {
 	if(!IsAlive())
 		return false;
+	
+	Entity* lock;
+	auto lock_locked = [](Entity* e) { return (e->type == EXIT ? ((Exit*)e)->locked : ((Item*)e)->locked); };
+	auto lock_key = [](Entity* e) { return (e->type == EXIT ? ((Exit*)e)->key : ((Item*)e)->key); };
+	auto lock_name = [this](Entity* e) { return (e->type == EXIT ? ((Exit*)e)->GetNameFrom((Room*)parent) : ((Item*)e)->name); };
+	auto lock_hidden = [](Entity* e) { return (e->type == EXIT ? ((Exit*)e)->hidden : ((Item*)e)->hidden); };
 
 	Exit* exit = GetRoom()->GetExit(args[1]);
 
-	if(exit == NULL)
+	if (exit == NULL)
 	{
-		cout << "\nThere is no exit at '" << args[1] << "'.\n";
+		Item* l_item = (Item*)GetRoom()->Find(args[1], ITEM);
+		if (l_item == NULL) {
+			l_item = (Item*)Find(args[1], ITEM);
+			if (l_item == NULL) {
+				cout << "\nThere is no exit nor object '" << args[1] << "'.\n";
+				return false;
+			}
+		}
+		lock = l_item;
+		lock->type = ITEM;
+	}
+	else {
+		lock = exit;
+		lock->type = EXIT;
+	}
+
+	if (lock_hidden(lock)) {
+		cout << "\nThere is no exit nor object '" << args[1] << "'.\n";
 		return false;
 	}
 
-	if(exit->locked == true)
+	if (lock_locked(lock) == true)
 	{
-		cout << "\nThat exit is already locked.\n";
+		cout << "\nThat is already locked.\n";
 		return false;
 	}
 
 	Item* item = (Item*)Find(args[3], ITEM);
 
-	if(item == NULL)
+	if (item == NULL)
 	{
 		cout << "\nItem '" << args[3] << "' not found in your inventory.\n";
 		return false;
 	}
 
-	if(exit->key != item)
+	if (lock_key(lock) != item)
 	{
-		cout << "\nItem '" << item->name << "' is not the key for " << exit->GetNameFrom((Room*)parent) << ".\n";
+		cout << "\nItem '" << item->name << "' is not the key for " << lock_name(lock) << ".\n";
 		return false;
 	}
 
-	cout << "\nYou lock " << exit->GetNameFrom((Room*)parent) << "...\n";
+	cout << "\nYou lock " << lock_name(lock) << "...\n";
 
-	exit->locked = true;
+	(lock->type == EXIT ? ((Exit*)lock)->locked : ((Item*)lock)->locked) = true;
 
 	return true;
 }
@@ -427,38 +480,82 @@ bool Player::UnLock(const vector<string>& args)
 	if(!IsAlive())
 		return false;
 
+	Entity* lock;
+	auto lock_locked = [](Entity* e) { return (e->type == EXIT ? ((Exit*)e)->locked : ((Item*)e)->locked); };
+	auto lock_key = [](Entity* e) { return (e->type == EXIT ? ((Exit*)e)->key : ((Item*)e)->key); };
+	auto lock_name = [this](Entity* e) { return (e->type == EXIT ? ((Exit*)e)->GetNameFrom((Room*)parent) : ((Item*)e)->name); };
+	auto lock_hidden = [](Entity* e) { return (e->type == EXIT ? ((Exit*)e)->hidden : ((Item*)e)->hidden); };
+
 	Exit* exit = GetRoom()->GetExit(args[1]);
 
-	if(exit == NULL)
+	if (exit == NULL)
 	{
-		cout << "\nThere is no exit at '" << args[1] << "'.\n";
-		return false;
+		Item* l_item = (Item*)GetRoom()->Find(args[1], ITEM);
+		if (l_item == NULL) {
+			l_item = (Item*)Find(args[1], ITEM);
+			if (l_item == NULL) {
+				cout << "\nThere is no exit nor object '" << args[1] << "'.\n";
+				return false;
+			}
+		}
+		lock = l_item;
+		lock->type = ITEM;
+	}
+	else {
+		lock = exit;
+		lock->type = EXIT;
 	}
 
-	if(exit->locked == false)
-	{
-		cout << "\nThat exit is not locked.\n";
+	if (lock_hidden(lock)) {
+		cout << "\nThere is no exit nor object '" << args[1] << "'.\n";
 		return false;
 	}
-
+	
+	if (lock_locked(lock) == false)
+	{
+		cout << "\nThat is already unlocked.\n";
+		return false;
+	}
+	
 	Item* item = (Item*)Find(args[3], ITEM);
 
-	if(item == NULL)
+	if (item == NULL)
 	{
-		cout << "\nKey '" << args[3] << "' not found in your inventory.\n";
+		cout << "\nItem '" << args[3] << "' not found in your inventory.\n";
 		return false;
 	}
 
-	if(exit->key != item)
+	if (lock_key(lock) != item)
 	{
-		cout << "\nKey '" << item->name << "' is not the key for " << exit->GetNameFrom((Room*)parent) << ".\n";
+		cout << "\nItem '" << item->name << "' is not the key for " << lock_name(lock) << ".\n";
 		return false;
 	}
 
-	cout << "\nYou unlock " << exit->GetNameFrom((Room*)parent) << "...\n";
+	cout << "\nYou unlock " << lock_name(lock) << "...\n";
 
-	exit->locked = false;
+	(lock->type == EXIT ? ((Exit*)lock)->locked : ((Item*)lock)->locked) = false;
 
+	return true;
+}
+
+bool Player::Move(const vector<string>& args)
+{
+	Item* item = (Item*)parent->Find(args[1], ITEM);
+
+	if (item == NULL || item->hidden)
+	{
+		cout << "\nThere is no item here with that name.\n";
+		return false;
+	}
+
+	cout << "\nYou move " << item->name << " aside.\n";
+	
+	if (item->hiding == NULL)
+		return false;
+	cout << item->move_description << "\n";
+	((item->hiding)->type == EXIT ? ((Exit*)item->hiding)->hidden : ((Item*)item->hiding)->hidden) = false;
+	item->hiding = NULL;
+	
 	return true;
 }
 

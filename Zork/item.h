@@ -19,7 +19,7 @@ enum ItemType
 class Item : public Entity
 {
 public:
-	Item(const char* name, const char* description, Entity* parent, const int capacity, const int size, ItemType item_type = COMMON);
+	Item(const char* name, const char* description, Entity* parent, const int capacity, const int size, bool takeable = true, ItemType item_type = COMMON);
 	~Item();
 
 	void Look() const;
@@ -31,6 +31,13 @@ public :
 	int max_value;
 	ItemType item_type;
 	int item_size;
+	bool locked;
+	Entity* key;
+	bool hidden;
+	Entity* hiding;
+	std::string move_description;
+	bool takeable;
+
 };
 
 #endif //__Item__
