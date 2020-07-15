@@ -26,13 +26,15 @@ bool introduction() {
 	system("pause");
 	cout << "\n'H...H-Hello?' - you manage to say in a thin voice. A shiver goes down your spine and you feel heavy.\n";
 	cout << "\n'Let me introduce myself. I am Mephistopheles, the Prince of Hell.' -says the figure. Another shiver... -'You are here because I need something.'\n"
-		"...\n\n'I need something that you may be able to acquire. So I will offer you a Deal.'\n\n You are out of words, you try asking something but your voice does not"
+		"...\n\n'I need something that you may be able to acquire. So I will offer you a Deal.'\n\nYou are out of words, you try asking something but your voice does not"
 		" come out. The mysterious being who claims to be a prince of Hell proceeds:\n'Three items where stolen from Hell. MY items.'- Mephistopheles rises one hand.\n"
 		"'Three powerful magical objects that I created, the so called Trident of Mephistopheles:'\n\n";
 	system("pause");
 	cout << "\n'The first spike, The Purple Eye.'- an image appears in your mind - 'The second spike, Mephistopheles's Fire. And finally, The Black Third'- more images fill your"
 		"mind as it speaks. 'I need them back.'\n\nYou stutter -'I-I don...'\n'The Trident is in the realm of mortals. The deal is the following: I am resurrecting you,"
-		" so that you find the spikes and bring them to me. Do you accept the Contract? \n[Yes/No]\n\n";
+		" so that you find the spikes and bring them to me.' - The demon being stands up from its throne and steps a little closer. Now you can see it is definitely larger than a human."
+		"It wears some kind of brown robes on the low-half of its body, the torso is uncovered and you can see its skin is actually red. The humanoid is considerably musculated and large horns emerge"
+		" from its head. You can't see its face. - 'Do you accept the Contract?'\n[Yes/No]\n\n";
 	cout << ">";
 	
 	string answer;
@@ -42,6 +44,25 @@ bool introduction() {
 		return true;
 	else
 		return false;
+}
+
+bool epilogue() {
+	cout << "\nSuddenly, a magic light appears below your feet. A bunch of spirtual hands emerge from it and grabs you. You cannot move, you are being swallowed by the purple light.\n";
+	system("pause");
+	cout << "\nMphistopheles dialogue\n";
+	cout << "[Deliver/No]";
+	
+	string answer;
+	cin >> answer;
+	while (!Same(answer, "Deliver") && !Same(answer, "No")) {
+		cout << "\nThat is not an answer.\n[Deliver/No]";
+		cin >> answer;
+	}
+
+	if (Same(answer, "Deliver"))
+		return false;
+	else
+		return true;
 }
 
 // -------------------------------------------------
@@ -101,6 +122,12 @@ int main()
 
 			if (my_world.GameOver())
 				break;
+			else if (my_world.CheckEndConditions()) {
+				if (epilogue())
+					my_world.Ending();
+				else
+					break;
+			}
 
 			if (args.size() > 0)
 			{

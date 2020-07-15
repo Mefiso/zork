@@ -11,6 +11,8 @@ using namespace std;
 
 class Entity;
 class Player;
+class Room;
+class Creature;
 
 class World
 {
@@ -22,13 +24,19 @@ public :
 	bool Tick(vector<string>& args);
 	bool ParseCommand(vector<string>& args);
 	void GameLoop();
+	bool CheckEndConditions();
 	bool GameOver();
+	void Ending();
 
 private:
 
 	clock_t tick_timer;
 	list<Entity*> entities;
 	Player* player;
+	list<Entity*> objectives;
+	bool ended;
+	Room* final_room;
+
 };
 
 #endif //__World__

@@ -548,7 +548,7 @@ bool Player::Move(const vector<string>& args)
 		return false;
 	}
 
-	cout << "\nYou move " << item->name << " aside.\n";
+	cout << "\nYou try moving " << item->name << " aside.\n";
 	
 	if (item->hiding == NULL)
 		return false;
