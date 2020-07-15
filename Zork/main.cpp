@@ -21,7 +21,7 @@ bool introduction() {
 	cout << "\nSomething moved out there. You can't see, but you sensed it...\n"
 		"Suddenly, a voice! A smooth, whispering, yet clear voice: \n"
 		"'How does it feel, being dead?'- asks...\n'Oh! I am sorry, you can't speak.'- the voice direcly speaking to your mind. - 'Let me fix this.'\n"
-		"\nYou gasp abruptly. There isn't absolute darkness now, but neither an specific source of light.\nAt some point in the space before your eyes"
+		"\nYou gasp abruptly. There isn't absolute darkness now, but neither is there an specific source of light.\nAt some point in the space before your eyes"
 		" (you can't really tell the distance) there's a reddish humanoid figure sitting on a dark grey throne with yellowish white things stuck in it... Bones?\n\n";
 	system("pause");
 	cout << "\n'H...H-Hello?' - you manage to say in a thin voice. A shiver goes down your spine and you feel heavy.\n";
@@ -47,9 +47,15 @@ bool introduction() {
 }
 
 bool epilogue() {
-	cout << "\nSuddenly, a magic light appears below your feet. A bunch of spirtual hands emerge from it and grabs you. You cannot move, you are being swallowed by the purple light.\n";
+	cout << "\nSuddenly, a magic light appears below your feet. A bunch of spirtual hands emerge from it and grab you. You cannot move, you are being swallowed by the purple light.\n";
 	system("pause");
-	cout << "\nMphistopheles dialogue\n";
+	cout << "\nYou find yourself on a large dim lighted room. Four small floating fires illuminate the scene from the corners, and three columns arise towards a ceiling that you can't see. "
+		"One column behind you, and the others at each side of the room.\nSome meters away in front of you, a large humanoid figure stands before a throne. The creature has reddish skin, long"
+		" horns and something in its back... Folded wings? It's Mephistopheles.\n\n";
+	cout << "'Aah... Finally!' - exclaims the demon. - 'You've brought me the Trident. You have done well.'\nYou nod, not knowing what to say.\n'Now, give them to me and we will terminate the Contract'"
+		" - Mephistopheles says.\n\nYou make a couple steps forward to proceed with the delivery. You can see its face now. And then, it comes to your mind and you stop.\n'W-wait, what do you mean"
+		" terminate? You won't be taking this life away, will you?'- you ask. Mephistopheles stares at you for a moment, and then grins.\n'You noticed. Of course that is what it means, the Contract"
+		" specified that I give you a life TO find the Trident. The purpose of that life is to find the spikes and bring them to me, thus when that purpose is gone, so is the life.'"
 	cout << "[Deliver/No]";
 	
 	string answer;
