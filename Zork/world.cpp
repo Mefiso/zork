@@ -116,26 +116,26 @@ World::World()
 	Item* black = new Item("Black-Sphere", "The dark sphere emits a relentless buzz... It makes you feel sick, sends shivers down your spine and drains your life. It's the Black Third.", secret_lab, 0, 2);
 
 	// Weapons and armours --
-	Item* sword = new Item("Sword", "A simple old and rusty sword.", forest, 0, 4, M_WEAPON);
+	Item* sword = new Item("Sword", "A simple old and rusty sword.", forest, 0, 4, true, M_WEAPON);
 	sword->min_value = 2;
 	sword->max_value = 6;
 
 	Item* sword2 = new Item(*sword);
 	sword2->ChangeParentTo(butler);
 
-	Item* broom = new Item("Broomstick", "A crooked, old and dusty broomstick.", witch, 0, 6, M_WEAPON);
+	Item* broom = new Item("Broomstick", "A crooked, old and dusty broomstick.", witch, 0, 6, true, M_WEAPON);
 	broom->min_value = 0;
 	broom->max_value = 3;
 
-	Item* knife = new Item("Knife", "A nasty, blood covered big knife.", witch, 0, 2, M_WEAPON);
+	Item* knife = new Item("Knife", "A nasty, blood covered big knife.", witch, 0, 2, true, M_WEAPON);
 	knife->min_value = 2;
 	knife->max_value = 5;
 
-	Item* club = new Item("Greatclub", "Dangerous-looking club of great size.", troll, 0, 7, M_WEAPON);
+	Item* club = new Item("Greatclub", "Dangerous-looking club of great size.", troll, 0, 7, true, M_WEAPON);
 	club->min_value = 3;
 	club->max_value = 8;
 
-	Item* shield = new Item("Shield", "An old wooden shield.", butler, 0, 5, ARMOUR);
+	Item* shield = new Item("Shield", "An old wooden shield.", butler, 0, 5, true, ARMOUR);
 	shield->min_value = 1;
 	shield->max_value = 3;
 	

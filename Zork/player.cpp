@@ -280,22 +280,22 @@ bool Player::Equip(const vector<string>& args)
 	switch(item->item_type)
 	{
 		case M_WEAPON:
-		weapon = item;
-		break;
+			weapon = item;
+			break;
 
 		case D_WEAPON:
 			weapon = item;
 			break;
 
 		case ARMOUR:
-		armour = item;
-		break;
+			armour = item;
+			break;
 
 		default:
-		cout << "\n" << item->name << " cannot be equipped.\n";
-		return false;
+			cout << "\n" << item->name << " cannot be equipped.\n";
+			return false;
 	}
-		
+
 	cout << "\nYou equip " << item->name << "...\n";
 
 	return true;
