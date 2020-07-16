@@ -572,13 +572,13 @@ bool Player::Use(const vector<string>& args)
 	switch (item->item_type)
 	{
 	case HP_POTION:
-		hit_points += item->Use();
+		hit_points += item->GetValue();
 		container.remove(item);
 		current_storage -= item->item_size;
 		break;
 
 	case MP_POTION:
-		mana_points += item->Use();
+		mana_points += item->GetValue();
 		container.remove(item);
 		current_storage -= item->item_size;
 		break;

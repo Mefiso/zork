@@ -87,6 +87,13 @@ World::World()
 	ghost->intelligence = 2;
 	ghost->dexterity = 3;
 	final_boss = new Creature("Mephistopheles", "The Prince of Hell. A humanoid demon with red skin, large horns and devious face. It has three unmatched pairs of wings.", final_room, 35);
+	final_boss->hit_points = 37;
+	final_boss->min_damage = 5;
+	final_boss->max_damage = 11;
+	final_boss->min_protection = final_boss->max_protection = 7;
+	final_boss->strength = 3;
+	final_boss->intelligence = 4;
+	final_boss->dexterity = 3;
 
 	entities.push_back(butler);
 	entities.push_back(witch);
@@ -99,8 +106,9 @@ World::World()
 	ex3->key = key;
 	Item* sack = new Item("Sack", "Brown old sack. Looks like it might contain something.", forest, 5, 4);
 	Item* apple = new Item("Apple", "A perfect red apple.", sack, 0, 1, true, HP_POTION);
-	apple->usage_val = 4;
-	Item* crystal_ball = new Item("Palantir", "The witch uses it as a clairvoyant ball. It's The Purple Eye.", forest, 0, 2);
+	apple->min_value = 2;
+	apple->max_value = 4;
+	Item* crystal_ball = new Item("Palantir", "The witch uses it as a clairvoyant ball. It's The Purple Eye.", witch, 0, 2);
 	Item* chest = new Item("Chest", "Wooden small chest with iron lock.", cave, 4, 3);
 	chest->locked = true;
 	Item* pouch = new Item("Pouch", "Pouch filled with gold pieces.", chest, 0, 2);
@@ -114,8 +122,8 @@ World::World()
 	Item* rock = new Item("Rock", "Huge heavy rock.", cave, 0, 7);
 	rock->hiding = ex9;
 	rock->move_description = "On the wall behind, it appears a secret passage that goes up, deeper in the cavern.";
-	Item* red_stone = new Item("Redstone", "This ardent stone contains the power of infernal fire. It's Mephistopheles's Fire", forest, 0, 2);
-	Item* black = new Item("Black-Sphere", "The dark sphere emits a relentless buzz... It makes you feel sick, sends shivers down your spine and drains your life. It's the Black Third.", forest, 0, 2);
+	Item* red_stone = new Item("Redstone", "This ardent stone contains the power of infernal fire. It's Mephistopheles's Fire", treasure_room, 0, 2);
+	Item* black = new Item("Black-Sphere", "The dark sphere emits a relentless buzz... It makes you feel sick, sends shivers down your spine and drains your life. It's the Black Third.", secret_lab, 0, 2);
 
 	// Weapons and armours --
 	Item* sword = new Item("Sword", "A simple old and rusty sword.", forest, 0, 4, true, M_WEAPON);
@@ -168,12 +176,48 @@ World::World()
 	entities.push_back(shield);
 
 	// Player ----
-	player = new Player("Hero", "You are an awesome adventurer!", forest, 15);
+	player = new Player("Hero", "You are an awesome adventurer!", forest, 12);
 	player->hit_points = 20;
+	player->mana_points = 10;
 	player->strength = 1;
 	player->dexterity = 2;
 	player->intelligence = 2;
 	entities.push_back(player);
+
+	// Spells ---
+	Spell* stupidity = new Spell("Stupidty", "", ATTACK, HEAL, 2);
+	stupidity->min_value = 0;
+	stupidity->max_value = 6;
+	player->AddSpell(stupidity);
+
+	Spell* enrage = new Spell("Enrage", "", ATTACK, BUFF, 3);
+	enrage->stat = STR;
+	enrage->min_value = 7;
+	enrage->max_value = 10;
+	player->AddSpell(enrage);
+
+	Spell* shock = new Spell("Shock", "", ATTACK, DEBUFF, 2);
+	shock->stat = DEX;
+	shock->min_value = 3;
+	shock->max_value = 5;
+	player->AddSpell(shock);
+
+	Spell*  black_blood = new Spell("BlackBlood", "", HEAL, ATTACK, 3);
+	black_blood->min_value = 0;
+	black_blood->max_value = 6;
+	player->AddSpell(black_blood);
+
+	Spell* ultra_instinct = new Spell("UltraInstinct", "", HEAL, BUFF, 3);
+	ultra_instinct->stat = DEX;
+	ultra_instinct->min_value = 4;
+	ultra_instinct->max_value = 8;
+	player->AddSpell(ultra_instinct);
+
+	Spell* oblivion = new Spell("Oblivion", "", HEAL, DEBUFF, 1);
+	oblivion->stat = INT;
+	oblivion->min_value = 15;
+	oblivion->max_value = 20; // Yes, that means you won't use magic effectively anymore
+	player->AddSpell(oblivion);
 
 	// Objectives ----
 	objectives.push_back(crystal_ball);
@@ -275,6 +319,10 @@ bool World::ParseCommand(vector<string>& args)
 			{
 				player->Inventory();
 			}
+			else if (Same(args[0], "spells") || Same(args[0], "sp"))
+			{
+				player->SpellsBook();
+			}
 			else
 				ret = false;
 			break;
@@ -350,6 +398,10 @@ bool World::ParseCommand(vector<string>& args)
 			else if(Same(args[0], "drop") || Same(args[0], "put"))
 			{
 				player->Drop(args);
+			}
+			else if (Same(args[0], "cast") || Same(args[0], "c"))
+			{
+				player->Cast(args);
 			}
 			else
 				ret = false;

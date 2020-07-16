@@ -4,6 +4,8 @@
 #include "exit.h"
 #include "item.h"
 #include "creature.h"
+#include "spell.h"
+#include <map>
 
 /* Note: Creatures other than Player are not affected by hidden objects or exits, they can take
 or use them. That is because the hidden state of those Entities represents only their visibility
@@ -132,6 +134,23 @@ void Creature::Inventory() const
 		else if(*it == armour)
 			cout << (*it)->name << " (as armour)\n";
 		else
+			cout << (*it)->name << "\n";
+	}
+}
+
+// ----------------------------------------------------
+void Creature::SpellsBook() const
+{
+
+	if (spells_book.size() == 0)
+	{
+		cout << "\n" << name << " does not know any spells.\n";
+		return;
+	}
+
+	cout << "\n" << name << " knows:\n";
+	for (list<Spell*>::const_iterator it = spells_book.begin(); it != spells_book.cend(); ++it)
+	{
 			cout << (*it)->name << "\n";
 	}
 }
@@ -374,14 +393,14 @@ bool Creature::Attack(const vector<string>& args)
 }
 
 // ----------------------------------------------------
-int Creature::MakeAttack()
+void Creature::MakeAttack()
 {
 	/* Rolls damage from weapon and applies it to the comabt target Creature. It also makes this
 	Creature the target of the combat target if it wasn't. */
 	if(!IsAlive() || !combat_target->IsAlive()) // If either combatants are dead, remove targets.
 	{
 		combat_target = combat_target->combat_target = NULL;
-		return false;
+		return;
 	}
 
 	int result = (weapon) ? weapon->GetValue() : Roll(min_damage, max_damage);
@@ -399,11 +418,69 @@ int Creature::MakeAttack()
 	if(combat_target->combat_target == NULL)
 		combat_target->combat_target = this;
 
-	return result;
+	return;
 }
 
 // ----------------------------------------------------
-int Creature::ReceiveAttack(int damage)
+void Creature::Cast(vector<string>& args)
+{
+	/* Rolls damage/heal/other depending on the spell type. It also makes this
+	Creature the target of the combat target if it wasn't. */
+	if (!IsAlive()) // If either combatants are dead, remove targets.
+	{
+		return;
+	}
+
+	Spell* spell = FindSpell(args[1]);
+
+	if (spell == NULL)
+		return;
+
+	Creature* target;
+	if (Same(args[3], "me"))
+		target = (Creature*)parent->Find("Hero", PLAYER);
+	else
+		target = (Creature*)parent->Find(args[3], CREATURE);
+	
+	if (target == NULL)
+		return;
+
+	mana_points -= spell->cost;
+
+	// Create a functions map to deal with each type of spell.
+	typedef void (Creature::*pfunc)(int);
+	typedef map<SpellType, pfunc> spellMap;
+	spellMap spell_map;
+	spell_map[ATTACK] = &Creature::ReceiveMAttack;
+	spell_map[BUFF] = &Creature::ReceiveBuff;
+	spell_map[DEBUFF] = &Creature::ReceiveDebuff;
+	spell_map[HEAL] = &Creature::ReceiveHeal;
+
+	if (PlayerInRoom())
+		cout << "\n" << name << " casts " << spell->name << " on " << target->name << "\n";
+
+	int result = spell->GetValue() + intelligence;
+	if (spell->spell_type == DEBUFF || spell->spell_type == BUFF)
+		target_stat = spell->stat;
+
+	(target->*(spell_map[spell->spell_type]))(result);
+	if (spell->spell_type != spell->second_type) {
+		int result2 = spell->GetValue() + intelligence;
+		if (spell->second_type == DEBUFF || spell->second_type == BUFF)
+			target->target_stat = spell->stat;
+
+		(target->*(spell_map[spell->second_type]))(result2);
+	}
+
+	// make the attacked react and take me as a target
+	if (target->combat_target == NULL)
+		target->combat_target = this;
+
+	return;
+}
+
+// ----------------------------------------------------
+void Creature::ReceiveAttack(int damage)
 {
 	/* Subtract as many hit points as damage surpasses Creature's armour */
 	int prot = (armour) ? armour->GetValue() : Roll(min_protection, max_protection);
@@ -417,7 +494,88 @@ int Creature::ReceiveAttack(int damage)
 	if(IsAlive() == false)
 		Die();
 
-	return received;
+	return;
+}
+
+// ----------------------------------------------------
+void Creature::ReceiveMAttack(int damage)
+{
+	int prot = Roll(min_protection, max_protection);
+	int received = (damage - prot - dexterity / 2) > 0 ? damage - prot - dexterity / 2 : 0;
+
+	hit_points -= received;
+
+	if (PlayerInRoom())
+		cout << name << " is hit for " << received << " damage (" << prot << " blocked, " << dexterity / 2 << " dodged) \n";
+
+	if (IsAlive() == false)
+		Die();
+
+	return;
+}
+
+// ----------------------------------------------------
+void Creature::ReceiveDebuff(int debuff)
+{
+	int prot = intelligence;
+	int received = (debuff*2/3 - prot) > 0 ? debuff * 2 / 3 - prot : 0;
+	switch (target_stat) {
+	case STR:
+		strength -= received;
+		if (PlayerInRoom())
+			cout << name << " is debuffed for " << received << " in strength.\n";
+		break;
+	case DEX:
+		dexterity -= received;
+		if (PlayerInRoom())
+			cout << name << " is debuffed for " << received << " in dexterity.\n";
+		break;
+	case INT:
+		intelligence -= received;
+		if (PlayerInRoom())
+			cout << name << " is debuffed for " << received << " in intelligence.\n";
+		break;
+	default:
+		return;
+	}
+
+	return;
+}
+
+// ----------------------------------------------------
+void Creature::ReceiveBuff(int buff)
+{
+	int ad_buff = buff * 2 / 3;
+	switch (target_stat) {
+	case STR:
+		strength += ad_buff;
+		if (PlayerInRoom())
+			cout << name << " is buffed for " << ad_buff << " in strength.\n";
+		break;
+	case DEX:
+		dexterity += ad_buff;
+		if (PlayerInRoom())
+			cout << name << " is buffed for " << ad_buff << " in dexterity.\n";
+		break;
+	case INT:
+		intelligence += ad_buff;
+		if (PlayerInRoom())
+			cout << name << " is buffed for " << ad_buff << " in intelligence.\n";
+		break;
+	default:
+		return;
+	}
+
+	return;
+}
+
+// ----------------------------------------------------
+void Creature::ReceiveHeal(int heal)
+{
+	hit_points += heal;
+	if (PlayerInRoom())
+		cout << name << " is healed for " << heal << "\n";
+	return;
 }
 
 // ----------------------------------------------------
@@ -471,6 +629,7 @@ void Creature::Stats() const
 	cout << "\n";
 }
 
+// ----------------------------------------------------
 bool Creature::Use(const vector<string>& args)
 {
 	if (!IsAlive())
@@ -484,13 +643,13 @@ bool Creature::Use(const vector<string>& args)
 	switch (item->item_type)
 	{
 	case HP_POTION:
-		hit_points += item->Use();
+		hit_points += item->GetValue();
 		container.remove(item);
 		current_storage -= item->item_size;
 		break;
 
 	case MP_POTION:
-		mana_points += item->Use();
+		mana_points += item->GetValue();
 		container.remove(item);
 		current_storage -= item->item_size;
 		break;
@@ -503,4 +662,24 @@ bool Creature::Use(const vector<string>& args)
 		cout << "\n" << name << " uses " << item->name << "...\n";
 
 	return true;
+}
+
+// ----------------------------------------------------
+Spell* Creature::FindSpell(const string& name) const
+{
+	/* Iterates over the list of contained spells and returns the pointer to the Spell with the
+	specified name and type */
+	for (list<Spell*>::const_iterator it = spells_book.begin(); it != spells_book.cend(); ++it)
+	{
+		if (Same((*it)->name, name))
+			return *it;
+	}
+
+	return NULL;
+}
+
+// ----------------------------------------------------
+void Creature::AddSpell(Spell* spell)
+{
+	spells_book.push_back(spell);
 }

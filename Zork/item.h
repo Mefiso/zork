@@ -27,7 +27,6 @@ public:
 	void Look() const;
 	void ChangeParentTo(Entity* new_parent);
 	int GetValue() const;
-	int Use();
 
 public :
 	int min_value;
@@ -40,7 +39,6 @@ public :
 	Entity* hiding;
 	std::string move_description;
 	bool takeable;
-	int usage_val;
 
 };
 

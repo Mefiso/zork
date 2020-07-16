@@ -3,9 +3,11 @@
 
 #include <string>
 #include "entity.h"
+#include "spell.h"
 
 class Room;
 class Item;
+class Spell;
 
 using namespace std;
 
@@ -28,18 +30,25 @@ public:
 	virtual void Tick();
 
 	virtual bool Attack(const vector<string>& args);
-	virtual int MakeAttack();
-	virtual int ReceiveAttack(int damage);
+	virtual void MakeAttack();
+	virtual void Cast(vector<string>& args);
+	virtual void ReceiveAttack(int damage);
+	virtual void ReceiveMAttack(int damage);
+	virtual void ReceiveDebuff(int debuff);
+	virtual void ReceiveBuff(int buff);
+	virtual void ReceiveHeal(int heal);
 	virtual void Die();
 	virtual bool Loot(const vector<string>& args);
 	virtual void Stats() const;
 	virtual bool Use(const vector<string>& args);
+	virtual void AddSpell(Spell* spell);
+	virtual void SpellsBook() const;
 
 	Room* GetRoom() const;
 	bool PlayerInRoom() const;
 	bool IsAlive() const;
 
-public :
+public:
 
 	int hit_points;
 	int mana_points;
@@ -53,6 +62,11 @@ public :
 	Creature* combat_target;
 	Item* weapon;
 	Item* armour;
+	list <Spell*> spells_book;
+
+private:
+	Spell* FindSpell(const string& name) const;
+	StatEffect target_stat;
 };
 
 #endif //__Creature__

@@ -8,7 +8,7 @@
 // ----------------------------------------------------
 Item::Item(const char* title, const char* description, Entity* parent, const int capacity, const int size, bool takeable, ItemType item_type) :
 	Entity(title, description, capacity, parent),
-	item_type(item_type), item_size(size), locked(false), key(NULL), hidden(false), hiding(NULL), takeable(takeable), usage_val(0)
+	item_type(item_type), item_size(size), locked(false), key(NULL), hidden(false), hiding(NULL), takeable(takeable)
 {
 	type = ITEM;
 	min_value = max_value = 0; // sets min and max values to 0 by default
@@ -68,9 +68,4 @@ int Item::GetValue() const
 {
 	/* Returns a random value between min and max if max>0, otherwise returns 0 */
 	return Roll(min_value, max_value);
-}
-
-int Item::Use()
-{
-	return usage_val;
 }
