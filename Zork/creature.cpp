@@ -14,7 +14,7 @@ Creature::Creature(const char* title, const char* description, Room* room, const
 Entity(title, description, capacity, (Entity*)room/*Where the Creature is, currently*/)
 {
 	type = CREATURE;
-	hit_points = 1;
+	hit_points = mana_points = 1;
 	min_damage = max_damage = min_protection = max_protection = 0;
 	strength = dexterity = intelligence = 0;
 	weapon = armour = NULL;
@@ -460,6 +460,7 @@ void Creature::Stats() const
 {
 	/* Prints all creature stats. */
 	cout << "\nHit Points: " << hit_points;
+	cout << "\nMana Points: " << mana_points;
 	cout << "\nAttack: (" << ((weapon) ? weapon->name : "no weapon") << ") ";
 	cout << ((weapon) ? weapon->min_value : min_damage) << "-" << ((weapon) ? weapon->max_value : max_damage);
 	cout << "\nProtection: (" << ((armour) ? armour->name : "no armour") << ") ";
@@ -468,4 +469,38 @@ void Creature::Stats() const
 	cout << "\nDexterity: " << dexterity;
 	cout << "\nIntelligence: " << intelligence;
 	cout << "\n";
+}
+
+bool Creature::Use(const vector<string>& args)
+{
+	if (!IsAlive())
+		return false;
+
+	Item* item = (Item*)Find(args[1], ITEM);
+
+	if (item == NULL)
+		return false;
+
+	switch (item->item_type)
+	{
+	case HP_POTION:
+		hit_points += item->Use();
+		container.remove(item);
+		current_storage -= item->item_size;
+		break;
+
+	case MP_POTION:
+		mana_points += item->Use();
+		container.remove(item);
+		current_storage -= item->item_size;
+		break;
+
+	default:
+		return false;
+	}
+
+	if (PlayerInRoom())
+		cout << "\n" << name << " uses " << item->name << "...\n";
+
+	return true;
 }

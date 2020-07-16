@@ -559,6 +559,40 @@ bool Player::Move(const vector<string>& args)
 	return true;
 }
 
+bool Player::Use(const vector<string>& args)
+{
+	Item* item = (Item*)Find(args[1], ITEM);
+
+	if (item == NULL)
+	{
+		cout << "\nCannot find '" << args[1] << "', is not in your inventory.\n";
+		return false;
+	}
+
+	switch (item->item_type)
+	{
+	case HP_POTION:
+		hit_points += item->Use();
+		container.remove(item);
+		current_storage -= item->item_size;
+		break;
+
+	case MP_POTION:
+		mana_points += item->Use();
+		container.remove(item);
+		current_storage -= item->item_size;
+		break;
+
+	default:
+		cout << "\n" << item->name << " cannot be used.\n";
+		return false;
+	}
+
+	cout << "\nYou use " << item->name << "...\n";
+
+	return true;
+}
+
 void Player::Tick()
 {}
 

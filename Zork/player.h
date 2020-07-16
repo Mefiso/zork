@@ -26,6 +26,7 @@ public:
 	void Tick();
 	void Die();
 	bool Move(const vector<string>& args);
+	bool Use(const vector<string>& args);
 
 public :
 

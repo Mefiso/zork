@@ -33,6 +33,7 @@ public:
 	virtual void Die();
 	virtual bool Loot(const vector<string>& args);
 	virtual void Stats() const;
+	virtual bool Use(const vector<string>& args);
 
 	Room* GetRoom() const;
 	bool PlayerInRoom() const;
@@ -41,6 +42,7 @@ public:
 public :
 
 	int hit_points;
+	int mana_points;
 	int min_damage;
 	int max_damage;
 	int min_protection;

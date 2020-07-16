@@ -98,7 +98,8 @@ World::World()
 	Item* key = new Item("Key", "Old iron key.", mailbox, 0, 1);
 	ex3->key = key;
 	Item* sack = new Item("Sack", "Brown old sack. Looks like it might contain something.", forest, 5, 4);
-	Item* apple = new Item("Apple", "A perfect red apple.", sack, 0, 1);
+	Item* apple = new Item("Apple", "A perfect red apple.", sack, 0, 1, true, HP_POTION);
+	apple->usage_val = 4;
 	Item* crystal_ball = new Item("Palantir", "The witch uses it as a clairvoyant ball. It's The Purple Eye.", forest, 0, 2);
 	Item* chest = new Item("Chest", "Wooden small chest with iron lock.", cave, 4, 3);
 	chest->locked = true;
@@ -319,6 +320,10 @@ bool World::ParseCommand(vector<string>& args)
 			else if (Same(args[0], "move") || Same(args[0], "mv"))
 			{
 				player->Move(args);
+			}
+			else if (Same(args[0], "use") || Same(args[0], "u"))
+			{
+				player->Use(args);
 			}
 			else
 				ret = false;
