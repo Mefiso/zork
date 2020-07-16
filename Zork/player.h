@@ -17,6 +17,7 @@ public:
 	bool Take(const vector<string>& args);
 	bool Drop(const vector<string>& args);
 	void Inventory() const;
+	void SpellsBook() const;
 	bool Equip(const vector<string>& args);
 	bool UnEquip(const vector<string>& args);
 	bool Examine(const vector<string>& args) const;

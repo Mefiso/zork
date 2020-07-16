@@ -188,40 +188,52 @@ World::World()
 	player->intelligence = 2;
 	entities.push_back(player);
 
-	// Spells ---
+	// Spells and Scrolls---
 	Spell* stupidity = new Spell("Stupidity", "", ATTACK, HEAL, 2);
 	stupidity->min_value = 0;
 	stupidity->max_value = 6;
-	player->AddSpell(stupidity);
+	//player->AddSpell(stupidity);
+	Item* stupid_scroll = new Item("Stupidity-scroll", "A magic scripture. Allows to learn the Stupidity spell.", forest, 0, 1, true, SCROLL);
+	stupid_scroll->spell = stupidity;
 
 	Spell* enrage = new Spell("Enrage", "", ATTACK, BUFF, 3);
 	enrage->stat = STR;
 	enrage->min_value = 7;
 	enrage->max_value = 10;
-	player->AddSpell(enrage);
-
+	//player->AddSpell(enrage);
+	Item* enrage_scroll = new Item("Enrage-scroll", "A magic scripture. Allows to learn the Enrage spell.", forest, 0, 1, true, SCROLL);
+	enrage_scroll->spell = enrage;
+	
 	Spell* shock = new Spell("Shock", "", ATTACK, DEBUFF, 2);
 	shock->stat = DEX;
 	shock->min_value = 3;
 	shock->max_value = 5;
-	player->AddSpell(shock);
+	//player->AddSpell(shock);
+	Item* shock_scroll = new Item("Shock-scroll", "A magic scripture. Allows to learn the Shock spell.", treasure_room, 0, 1, true, SCROLL);
+	shock_scroll->spell = shock;
 
 	Spell*  black_blood = new Spell("BlackBlood", "", HEAL, ATTACK, 3);
 	black_blood->min_value = 0;
 	black_blood->max_value = 6;
-	player->AddSpell(black_blood);
+	//player->AddSpell(black_blood);
+	Item* blackblood_scroll = new Item("BlackBlood-scroll", "A magic scripture. Allows to learn the BlackBlood spell.", treasure_room, 0, 1, true, SCROLL);
+	blackblood_scroll->spell = black_blood;
 
 	Spell* ultra_instinct = new Spell("UltraInstinct", "", HEAL, BUFF, 3);
 	ultra_instinct->stat = DEX;
 	ultra_instinct->min_value = 4;
 	ultra_instinct->max_value = 8;
-	player->AddSpell(ultra_instinct);
+	//player->AddSpell(ultra_instinct);
+	Item* ui_scroll = new Item("UltraInstinct-scroll", "A magic scripture. Allows to learn the UltraInstinct spell.", treasure_room, 0, 1, true, SCROLL);
+	ui_scroll->spell = ultra_instinct;
 
 	Spell* oblivion = new Spell("Oblivion", "", HEAL, DEBUFF, 1);
 	oblivion->stat = INT;
 	oblivion->min_value = 15;
 	oblivion->max_value = 20; // Yes, that means you won't use magic effectively anymore
-	player->AddSpell(oblivion);
+	//player->AddSpell(oblivion);
+	Item* oblivion_scroll = new Item("Oblivion-scroll", "A magic scripture. Allows to learn the Oblivion spell.", treasure_room, 0, 1, true, SCROLL);
+	oblivion_scroll->spell = oblivion;
 
 	// Objectives ----
 	objectives.push_back(crystal_ball);

@@ -8,7 +8,7 @@
 // ----------------------------------------------------
 Item::Item(const char* title, const char* description, Entity* parent, const int capacity, const int size, bool takeable, ItemType item_type) :
 	Entity(title, description, capacity, parent),
-	item_type(item_type), item_size(size), locked(false), key(NULL), hidden(false), hiding(NULL), takeable(takeable)
+	item_type(item_type), item_size(size), locked(false), key(NULL), hidden(false), hiding(NULL), takeable(takeable), spell(NULL)
 {
 	type = ITEM;
 	min_value = max_value = 0; // sets min and max values to 0 by default

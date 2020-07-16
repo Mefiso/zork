@@ -211,6 +211,23 @@ void Player::Inventory() const
 }
 
 // ----------------------------------------------------
+void Player::SpellsBook() const
+{
+
+	if (spells_book.size() == 0)
+	{
+		cout << "\nYou do not know any spells.\n";
+		return;
+	}
+
+	cout << "\nYour Spells Book contains:\n";
+	for (list<Spell*>::const_iterator it = spells_book.begin(); it != spells_book.cend(); ++it)
+	{
+		cout << (*it)->name << "\n";
+	}
+}
+
+// ----------------------------------------------------
 bool Player::Drop(const vector<string>& args)
 {
 	/* Leaves an Item from your inventory on the room or inside another Item. */
@@ -654,6 +671,12 @@ bool Player::Use(const vector<string>& args)
 
 	case MP_POTION:
 		mana_points += item->GetValue();
+		container.remove(item);
+		current_storage -= item->item_size;
+		break;
+
+	case SCROLL:
+		AddSpell(item->spell);
 		container.remove(item);
 		current_storage -= item->item_size;
 		break;
