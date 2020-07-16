@@ -6,6 +6,7 @@
       ],
       "name": "x64-Release",
       "includePath": [
+        "${workspaceRoot}\\..\\..\\..\\..\\..\\Downloads",
         "${env.INCLUDE}",
         "${workspaceRoot}\\**"
       ],

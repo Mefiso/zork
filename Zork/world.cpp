@@ -86,6 +86,7 @@ World::World()
 	ghost->min_protection = ghost->max_protection = 7;
 	ghost->intelligence = 2;
 	ghost->dexterity = 3;
+	final_boss = new Creature("Mephistopheles", "The Prince of Hell. A humanoid demon with red skin, large horns and devious face. It has three unmatched pairs of wings.", final_room, 35);
 
 	entities.push_back(butler);
 	entities.push_back(witch);
@@ -98,7 +99,7 @@ World::World()
 	ex3->key = key;
 	Item* sack = new Item("Sack", "Brown old sack. Looks like it might contain something.", forest, 5, 4);
 	Item* apple = new Item("Apple", "A perfect red apple.", sack, 0, 1);
-	Item* crystal_ball = new Item("Palantir", "The witch uses it as a clairvoyant ball. It's The Purple Eye.", witch, 0, 2);
+	Item* crystal_ball = new Item("Palantir", "The witch uses it as a clairvoyant ball. It's The Purple Eye.", forest, 0, 2);
 	Item* chest = new Item("Chest", "Wooden small chest with iron lock.", cave, 4, 3);
 	chest->locked = true;
 	Item* pouch = new Item("Pouch", "Pouch filled with gold pieces.", chest, 0, 2);
@@ -112,8 +113,8 @@ World::World()
 	Item* rock = new Item("Rock", "Huge heavy rock.", cave, 0, 7);
 	rock->hiding = ex9;
 	rock->move_description = "On the wall behind, it appears a secret passage that goes up, deeper in the cavern.";
-	Item* red_stone = new Item("Redstone", "This ardent stone contains the power of infernal fire. It's Mephistopheles's Fire", treasure_room, 0, 2);
-	Item* black = new Item("Black-Sphere", "The dark sphere emits a relentless buzz... It makes you feel sick, sends shivers down your spine and drains your life. It's the Black Third.", secret_lab, 0, 2);
+	Item* red_stone = new Item("Redstone", "This ardent stone contains the power of infernal fire. It's Mephistopheles's Fire", forest, 0, 2);
+	Item* black = new Item("Black-Sphere", "The dark sphere emits a relentless buzz... It makes you feel sick, sends shivers down your spine and drains your life. It's the Black Third.", forest, 0, 2);
 
 	// Weapons and armours --
 	Item* sword = new Item("Sword", "A simple old and rusty sword.", forest, 0, 4, true, M_WEAPON);
@@ -177,6 +178,8 @@ World::World()
 	objectives.push_back(crystal_ball);
 	objectives.push_back(red_stone);
 	objectives.push_back(black);
+
+	ended = false;
 }
 
 // ----------------------------------------------------
@@ -378,4 +381,11 @@ bool World::GameOver()
 void World::Ending()
 {
 	player->ChangeParentTo(final_room);
+}
+
+bool World::Win()
+{
+	if (final_boss->hit_points <= 0)
+		return true;
+	return false;
 }

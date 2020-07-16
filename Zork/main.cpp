@@ -55,20 +55,27 @@ bool epilogue() {
 	cout << "'Aah... Finally!' - exclaims the demon. - 'You've brought me the Trident. You have done well.'\nYou nod, not knowing what to say.\n'Now, give them to me and we will terminate the Contract'"
 		" - Mephistopheles says.\n\nYou make a couple steps forward to proceed with the delivery. You can see its face now. And then, it comes to your mind and you stop.\n'W-wait, what do you mean"
 		" terminate? You won't be taking this life away, will you?'- you ask. Mephistopheles stares at you for a moment, and then grins.\n'You noticed. Of course that is what it means, the Contract"
-		" specified that I give you a life TO find the Trident. The purpose of that life is to find the spikes and bring them to me, thus when that purpose is gone, so is the life.'"
+		" specified that I give you a life TO find the Trident. The purpose of that life is to find the spikes and bring them to me, thus when that purpose is gone, so is the life.'\n"
+		"You can't believe what you are hearing. Words have left you.\n'You should be grateful I gave you this experience, don't you think? You were dead to begin with. So quit being so"
+		" dubitative and hand the items over. Now!' - the demon commands.\n\n";
 	cout << "[Deliver/No]";
+	cout << "\n\n>";
 	
 	string answer;
 	cin >> answer;
 	while (!Same(answer, "Deliver") && !Same(answer, "No")) {
 		cout << "\nThat is not an answer.\n[Deliver/No]";
+		cout << "\n\n>";
 		cin >> answer;
 	}
 
 	if (Same(answer, "Deliver"))
 		return false;
-	else
+	else {
+		cout << "All of a sudden, an invisible energy knocks you backwards! Mephistopheles extends its three pairs of terrible wings. The top, powerful wings of fire; the middle pair, scary"
+			" membranous bat-like wings; and the bottom, a beatiful pair of dark angel wings. The Prince of Hell extends one arm and a powerful scarlet trident appears in its hand.\n\n\n";
 		return true;
+	}
 }
 
 // -------------------------------------------------
@@ -129,18 +136,28 @@ int main()
 			if (my_world.GameOver())
 				break;
 			else if (my_world.CheckEndConditions()) {
-				if (epilogue())
+				if (epilogue()) {
+					args.clear();
+					player_input = "";
 					my_world.Ending();
+					args.push_back("look");
+				}
 				else
 					break;
 			}
-
-			if (args.size() > 0)
+			else if (args.size() > 0)
 			{
 				/* If there's still commands in args vector, deletes them. */
 				args.clear();
 				player_input = "";
 				cout << "\n> ";
+			}
+
+			if (my_world.Win()) {
+				cout << RED_ "\nYou WON!! Congratulations!\n" _WHITE;
+				cout << "\nThanks for playing, Bye!\n";
+				system("pause");
+				return 0;
 			}
 		}
 	}

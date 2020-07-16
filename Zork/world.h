@@ -27,6 +27,7 @@ public :
 	bool CheckEndConditions();
 	bool GameOver();
 	void Ending();
+	bool Win();
 
 private:
 
@@ -36,6 +37,7 @@ private:
 	list<Entity*> objectives;
 	bool ended;
 	Room* final_room;
+	Creature* final_boss;
 
 };
 
