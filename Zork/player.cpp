@@ -4,6 +4,7 @@
 #include "exit.h"
 #include "item.h"
 #include "player.h"
+#include <map>
 
 // ----------------------------------------------------
 Player::Player(const char* title, const char* description, Room* room, const int capacity) :
@@ -65,6 +66,18 @@ void Player::Look(const vector<string>& args) const
 	{
 		parent->Look();
 	}
+}
+
+void Player::Read(const vector<string>& args) const
+{
+	Spell* spell = FindSpell(args[1]);
+
+	if (spell == NULL) {
+		cout << "\n" << args[1] << " is not a spell in your spells book.";
+		return;
+	}
+	else
+		spell->Look();
 }
 
 // ----------------------------------------------------
@@ -366,6 +379,68 @@ bool Player::Attack(const vector<string>& args)
 	cout << "\nYou attack " << target->name << "!\n";
 	MakeAttack();
 	return true;
+}
+
+void Player::Cast(vector<string>& args)
+{
+	/* Rolls damage/heal/other depending on the spell type. It also makes this
+	Creature the target of the combat target if it wasn't. */
+	
+	Spell* spell = FindSpell(args[1]);
+
+	if (spell == NULL) {
+		cout << "\n" << args[1] << " is not a spell in your spells book.";
+		return;
+	}
+	else if (mana_points - (spell->cost) < 0) {
+		cout << "\nYou have not enough mana points.";
+		return;
+	}
+
+	Creature* target;
+	if (Same(args[3], "me"))
+		target = (Creature*)parent->Find(PLAYER);
+	else
+		target = (Creature*)parent->Find(args[3], CREATURE);
+
+	if (target == NULL) {
+		cout << "\n" << args[3] << " is not here.";
+		return;
+	}
+
+	mana_points -= spell->cost;
+
+	// Create a functions map to deal with each type of spell.
+	typedef void (Creature::* pfunc)(int);
+	typedef map<SpellType, pfunc> spellMap;
+	spellMap spell_map;
+	spell_map[ATTACK] = &Creature::ReceiveMAttack;
+	spell_map[BUFF] = &Creature::ReceiveBuff;
+	spell_map[DEBUFF] = &Creature::ReceiveDebuff;
+	spell_map[HEAL] = &Creature::ReceiveHeal;
+
+	if (PlayerInRoom())
+		cout << "\nYou cast " << spell->name << " on " << target->name << "\n";
+
+	int result = spell->GetValue() + intelligence;
+	if (spell->spell_type == DEBUFF || spell->spell_type == BUFF)
+		target_stat = spell->stat;
+	
+	(target->*(spell_map[spell->spell_type]))(result);
+	
+	if (spell->spell_type != spell->second_type) { // Secondary effect
+		int result2 = spell->GetValue() + intelligence;
+		if (spell->second_type == DEBUFF || spell->second_type == BUFF)
+			target->target_stat = spell->stat;
+
+		(target->*(spell_map[spell->second_type]))(result2);
+	}
+
+	// make the attacked react and take me as a target
+	if (target->combat_target == NULL)
+		target->combat_target = this;
+
+	return;
 }
 
 // ----------------------------------------------------

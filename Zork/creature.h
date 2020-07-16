@@ -47,6 +47,7 @@ public:
 	Room* GetRoom() const;
 	bool PlayerInRoom() const;
 	bool IsAlive() const;
+	Spell* FindSpell(const string& name) const;
 
 public:
 
@@ -63,10 +64,8 @@ public:
 	Item* weapon;
 	Item* armour;
 	list <Spell*> spells_book;
-
-private:
-	Spell* FindSpell(const string& name) const;
 	StatEffect target_stat;
+	
 };
 
 #endif //__Creature__

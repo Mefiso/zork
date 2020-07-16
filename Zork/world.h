@@ -38,7 +38,6 @@ private:
 	bool ended;
 	Room* final_room;
 	Creature* final_boss;
-
 };
 
 #endif //__World__

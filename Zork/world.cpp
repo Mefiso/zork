@@ -22,7 +22,7 @@ World::World()
 	Room* hillside = new Room("Hillside", "A medium sized hill rises before you. The small amount of trees in this area let you see a cave on the slope.");
 	Room* hilltop = new Room("Hilltop", "Wind's howling. From the peak you can see the forest and the vast shore on the other side of the house.");
 	Room* cave = new Room("Cave", "You are in a cold, damp cavern. Almost no light enters this place.");
-	Room* secret_lab = new Room("Laboratory", "The secret laboratory of an alchemist. Crysal pipes, flasks, liquids and fumes all over the place.");
+	Room* secret_lab = new Room("Laboratory", "The secret laboratory of an alchemist. Crystal pipes, flasks, liquids and fumes all over the place.");
 	Room* treasure_room = new Room("Grotto", "You enter deeper in the cave. Here the high ceiling is open and you can see the sky.");
 	final_room = new Room("Hell", "Obscure large room, with little floating fires on the corners. It is made of dark grey stone, you can't see the ceiling, only darkness. At the end of the room there's a large Throne.");
 
@@ -50,6 +50,7 @@ World::World()
 	entities.push_back(cave);
 	entities.push_back(secret_lab);
 	entities.push_back(treasure_room);
+	entities.push_back(final_room);
 
 	entities.push_back(ex1);
 	entities.push_back(ex2);
@@ -83,14 +84,16 @@ World::World()
 	ghost->hit_points = 10;
 	ghost->min_damage = 1;
 	ghost->max_damage = 3;
-	ghost->min_protection = ghost->max_protection = 7;
+	ghost->min_protection = 6;
+	ghost->max_protection = 7;
 	ghost->intelligence = 2;
 	ghost->dexterity = 3;
 	final_boss = new Creature("Mephistopheles", "The Prince of Hell. A humanoid demon with red skin, large horns and devious face. It has three unmatched pairs of wings.", final_room, 35);
-	final_boss->hit_points = 37;
+	final_boss->hit_points = 1;
 	final_boss->min_damage = 5;
 	final_boss->max_damage = 11;
-	final_boss->min_protection = final_boss->max_protection = 7;
+	final_boss->min_protection = 7;
+	final_boss->max_protection = 8;
 	final_boss->strength = 3;
 	final_boss->intelligence = 4;
 	final_boss->dexterity = 3;
@@ -99,6 +102,7 @@ World::World()
 	entities.push_back(witch);
 	entities.push_back(troll);
 	entities.push_back(ghost);
+	entities.push_back(final_boss);
 
 	// Items -----
 	Item* mailbox = new Item("Mailbox", "Looks like it might contain something.", house, 3, 3);
@@ -108,7 +112,7 @@ World::World()
 	Item* apple = new Item("Apple", "A perfect red apple.", sack, 0, 1, true, HP_POTION);
 	apple->min_value = 2;
 	apple->max_value = 4;
-	Item* crystal_ball = new Item("Palantir", "The witch uses it as a clairvoyant ball. It's The Purple Eye.", witch, 0, 2);
+	Item* crystal_ball = new Item("Palantir", "The witch uses it as a clairvoyant ball. It's The Purple Eye.", forest, 0, 2);
 	Item* chest = new Item("Chest", "Wooden small chest with iron lock.", cave, 4, 3);
 	chest->locked = true;
 	Item* pouch = new Item("Pouch", "Pouch filled with gold pieces.", chest, 0, 2);
@@ -122,8 +126,8 @@ World::World()
 	Item* rock = new Item("Rock", "Huge heavy rock.", cave, 0, 7);
 	rock->hiding = ex9;
 	rock->move_description = "On the wall behind, it appears a secret passage that goes up, deeper in the cavern.";
-	Item* red_stone = new Item("Redstone", "This ardent stone contains the power of infernal fire. It's Mephistopheles's Fire", treasure_room, 0, 2);
-	Item* black = new Item("Black-Sphere", "The dark sphere emits a relentless buzz... It makes you feel sick, sends shivers down your spine and drains your life. It's the Black Third.", secret_lab, 0, 2);
+	Item* red_stone = new Item("Redstone", "This ardent stone contains the power of infernal fire. It's Mephistopheles's Fire", forest, 0, 2);
+	Item* black = new Item("Black-Sphere", "The dark sphere emits a relentless buzz... It makes you feel sick, sends shivers down your spine and drains your life. It's the Black Third.", forest, 0, 2);
 
 	// Weapons and armours --
 	Item* sword = new Item("Sword", "A simple old and rusty sword.", forest, 0, 4, true, M_WEAPON);
@@ -178,14 +182,14 @@ World::World()
 	// Player ----
 	player = new Player("Hero", "You are an awesome adventurer!", forest, 12);
 	player->hit_points = 20;
-	player->mana_points = 10;
+	player->mana_points = 8;
 	player->strength = 1;
 	player->dexterity = 2;
 	player->intelligence = 2;
 	entities.push_back(player);
 
 	// Spells ---
-	Spell* stupidity = new Spell("Stupidty", "", ATTACK, HEAL, 2);
+	Spell* stupidity = new Spell("Stupidity", "", ATTACK, HEAL, 2);
 	stupidity->min_value = 0;
 	stupidity->max_value = 6;
 	player->AddSpell(stupidity);
@@ -372,6 +376,10 @@ bool World::ParseCommand(vector<string>& args)
 			else if (Same(args[0], "use") || Same(args[0], "u"))
 			{
 				player->Use(args);
+			}
+			else if (Same(args[0], "read") || Same(args[0], "rd"))
+			{
+				player->Read(args);
 			}
 			else
 				ret = false;

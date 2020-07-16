@@ -426,23 +426,19 @@ void Creature::Cast(vector<string>& args)
 {
 	/* Rolls damage/heal/other depending on the spell type. It also makes this
 	Creature the target of the combat target if it wasn't. */
-	if (!IsAlive()) // If either combatants are dead, remove targets.
+	if (!IsAlive()) // If  dead, return
 	{
 		return;
 	}
 
 	Spell* spell = FindSpell(args[1]);
 
-	if (spell == NULL)
+	if (spell == NULL || mana_points-(spell->cost) < 0)
 		return;
 
-	Creature* target;
-	if (Same(args[3], "me"))
-		target = (Creature*)parent->Find("Hero", PLAYER);
-	else
-		target = (Creature*)parent->Find(args[3], CREATURE);
+	Creature* target = (Creature*)parent->Find(args[3], CREATURE);
 	
-	if (target == NULL)
+	if (target == NULL || !target->IsAlive()) // No target or dead
 		return;
 
 	mana_points -= spell->cost;
@@ -500,14 +496,13 @@ void Creature::ReceiveAttack(int damage)
 // ----------------------------------------------------
 void Creature::ReceiveMAttack(int damage)
 {
+	
 	int prot = Roll(min_protection, max_protection);
 	int received = (damage - prot - dexterity / 2) > 0 ? damage - prot - dexterity / 2 : 0;
-
 	hit_points -= received;
-
 	if (PlayerInRoom())
 		cout << name << " is hit for " << received << " damage (" << prot << " blocked, " << dexterity / 2 << " dodged) \n";
-
+	cout << "GG";
 	if (IsAlive() == false)
 		Die();
 
