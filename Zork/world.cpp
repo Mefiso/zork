@@ -24,6 +24,7 @@ World::World()
 	Room* cave = new Room("Cave", "You are in a cold, damp cavern. Almost no light enters this place.");
 	Room* secret_lab = new Room("Laboratory", "The secret laboratory of an alchemist. Crysal pipes, flasks, liquids and fumes all over the place.");
 	Room* treasure_room = new Room("Grotto", "You enter deeper in the cave. Here the high ceiling is open and you can see the sky.");
+	final_room = new Room("Hell", "Obscure large room, with little floating fires on the corners. It is made of dark grey stone, you can't see the ceiling, only darkness. At the end of the room there's a large Throne.");
 
 	Exit* ex1 = new Exit("east", "west", "Little path", house, forest);
 	Exit* ex2 = new Exit("down", "up", "Stairs", house, basement);
@@ -85,6 +86,7 @@ World::World()
 	ghost->min_protection = ghost->max_protection = 7;
 	ghost->intelligence = 2;
 	ghost->dexterity = 3;
+	final_boss = new Creature("Mephistopheles", "The Prince of Hell. A humanoid demon with red skin, large horns and devious face. It has three unmatched pairs of wings.", final_room, 35);
 
 	entities.push_back(butler);
 	entities.push_back(witch);
@@ -97,7 +99,7 @@ World::World()
 	ex3->key = key;
 	Item* sack = new Item("Sack", "Brown old sack. Looks like it might contain something.", forest, 5, 4);
 	Item* apple = new Item("Apple", "A perfect red apple.", sack, 0, 1);
-	Item* crystal_ball = new Item("Palantír", "The witch's clairvoyant ball.", witch, 0, 2);
+	Item* crystal_ball = new Item("Palantir", "The witch uses it as a clairvoyant ball. It's The Purple Eye.", forest, 0, 2);
 	Item* chest = new Item("Chest", "Wooden small chest with iron lock.", cave, 4, 3);
 	chest->locked = true;
 	Item* pouch = new Item("Pouch", "Pouch filled with gold pieces.", chest, 0, 2);
@@ -111,34 +113,37 @@ World::World()
 	Item* rock = new Item("Rock", "Huge heavy rock.", cave, 0, 7);
 	rock->hiding = ex9;
 	rock->move_description = "On the wall behind, it appears a secret passage that goes up, deeper in the cavern.";
+	Item* red_stone = new Item("Redstone", "This ardent stone contains the power of infernal fire. It's Mephistopheles's Fire", forest, 0, 2);
+	Item* black = new Item("Black-Sphere", "The dark sphere emits a relentless buzz... It makes you feel sick, sends shivers down your spine and drains your life. It's the Black Third.", forest, 0, 2);
 
 	// Weapons and armours --
-	Item* sword = new Item("Sword", "A simple old and rusty sword.", forest, 0, 4, M_WEAPON);
+	Item* sword = new Item("Sword", "A simple old and rusty sword.", forest, 0, 4, true, M_WEAPON);
 	sword->min_value = 2;
 	sword->max_value = 6;
 
 	Item* sword2 = new Item(*sword);
 	sword2->ChangeParentTo(butler);
 
-	Item* broom = new Item("Broomstick", "A crooked, old and dusty broomstick.", witch, 0, 6, M_WEAPON);
+	Item* broom = new Item("Broomstick", "A crooked, old and dusty broomstick.", witch, 0, 6, true, M_WEAPON);
 	broom->min_value = 0;
 	broom->max_value = 3;
 
-	Item* knife = new Item("Knife", "A nasty, blood covered big knife.", witch, 0, 2, M_WEAPON);
+	Item* knife = new Item("Knife", "A nasty, blood covered big knife.", witch, 0, 2, true, M_WEAPON);
 	knife->min_value = 2;
 	knife->max_value = 5;
 
-	Item* club = new Item("Greatclub", "Dangerous-looking club of great size.", troll, 0, 7, M_WEAPON);
+	Item* club = new Item("Greatclub", "Dangerous-looking club of great size.", troll, 0, 7, true, M_WEAPON);
 	club->min_value = 3;
 	club->max_value = 8;
 
-	Item* shield = new Item("Shield", "An old wooden shield.", butler, 0, 5, ARMOUR);
+	Item* shield = new Item("Shield", "An old wooden shield.", butler, 0, 5, true, ARMOUR);
 	shield->min_value = 1;
 	shield->max_value = 3;
 	
 	butler->AutoEquip();
 	witch->AutoEquip();
 	troll->AutoEquip();
+
 
 	entities.push_back(key);
 	entities.push_back(mailbox);
@@ -151,7 +156,9 @@ World::World()
 	entities.push_back(gold_key);
 	entities.push_back(wardrobe);
 	entities.push_back(rock);
-	
+	entities.push_back(red_stone);
+	entities.push_back(black);
+
 	entities.push_back(sword);
 	entities.push_back(sword2);
 	entities.push_back(broom);
@@ -160,12 +167,19 @@ World::World()
 	entities.push_back(shield);
 
 	// Player ----
-	player = new Player("Hero", "You are an awesome adventurer!", cave, 15);
+	player = new Player("Hero", "You are an awesome adventurer!", forest, 15);
 	player->hit_points = 20;
 	player->strength = 1;
 	player->dexterity = 2;
 	player->intelligence = 2;
 	entities.push_back(player);
+
+	// Objectives ----
+	objectives.push_back(crystal_ball);
+	objectives.push_back(red_stone);
+	objectives.push_back(black);
+
+	ended = false;
 }
 
 // ----------------------------------------------------
@@ -343,9 +357,35 @@ bool World::ParseCommand(vector<string>& args)
 	return ret;
 }
 
+bool World::CheckEndConditions() {
+	for (list<Entity*>::const_iterator it = entities.begin(); it != entities.cend(); ++it)
+	{
+		if ((find(objectives.begin(), objectives.end(), (*it)) != objectives.end()) && (*it)->parent != player)
+			return false;
+	}
+	if (!ended) {
+		ended = true;
+		return true;
+	}
+	else
+		return false;
+}
+
 bool World::GameOver()
 {
 	if (player->hit_points <= 0)
+		return true;
+	return false;
+}
+
+void World::Ending()
+{
+	player->ChangeParentTo(final_room);
+}
+
+bool World::Win()
+{
+	if (final_boss->hit_points <= 0)
 		return true;
 	return false;
 }
