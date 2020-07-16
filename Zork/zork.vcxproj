@@ -85,6 +85,7 @@
     <ClCompile Include="player.cpp" />
     <ClCompile Include="room.cpp" />
     <ClCompile Include="world.cpp" />
+    <ClCompile Include="spell.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="creature.h" />
@@ -95,6 +96,7 @@
     <ClInclude Include="player.h" />
     <ClInclude Include="room.h" />
     <ClInclude Include="world.h" />
+    <ClInclude Include="spell.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

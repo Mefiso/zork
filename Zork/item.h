@@ -3,6 +3,7 @@
 
 #include <string>
 #include "entity.h"
+#include "spell.h"
 
 class Room;
 
@@ -13,7 +14,10 @@ enum ItemType
 	COMMON,
 	M_WEAPON,
 	D_WEAPON,
-	ARMOUR
+	ARMOUR,
+	HP_POTION,
+	MP_POTION,
+	SCROLL
 };
 
 class Item : public Entity
@@ -37,7 +41,7 @@ public :
 	Entity* hiding;
 	std::string move_description;
 	bool takeable;
-
+	Spell* spell;
 };
 
 #endif //__Item__

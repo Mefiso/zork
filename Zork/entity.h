@@ -14,7 +14,8 @@ enum EntityType
 	ITEM,
 	CREATURE,
 	PLAYER,
-	NPC
+	NPC,
+	SPELL
 };
 
 class Entity

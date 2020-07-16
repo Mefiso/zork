@@ -22,7 +22,7 @@ World::World()
 	Room* hillside = new Room("Hillside", "A medium sized hill rises before you. The small amount of trees in this area let you see a cave on the slope.");
 	Room* hilltop = new Room("Hilltop", "Wind's howling. From the peak you can see the forest and the vast shore on the other side of the house.");
 	Room* cave = new Room("Cave", "You are in a cold, damp cavern. Almost no light enters this place.");
-	Room* secret_lab = new Room("Laboratory", "The secret laboratory of an alchemist. Crysal pipes, flasks, liquids and fumes all over the place.");
+	Room* secret_lab = new Room("Laboratory", "The secret laboratory of an alchemist. Crystal pipes, flasks, liquids and fumes all over the place.");
 	Room* treasure_room = new Room("Grotto", "You enter deeper in the cave. Here the high ceiling is open and you can see the sky.");
 	final_room = new Room("Hell", "Obscure large room, with little floating fires on the corners. It is made of dark grey stone, you can't see the ceiling, only darkness. At the end of the room there's a large Throne.");
 
@@ -50,6 +50,7 @@ World::World()
 	entities.push_back(cave);
 	entities.push_back(secret_lab);
 	entities.push_back(treasure_room);
+	entities.push_back(final_room);
 
 	entities.push_back(ex1);
 	entities.push_back(ex2);
@@ -83,22 +84,34 @@ World::World()
 	ghost->hit_points = 10;
 	ghost->min_damage = 1;
 	ghost->max_damage = 3;
-	ghost->min_protection = ghost->max_protection = 7;
+	ghost->min_protection = 6;
+	ghost->max_protection = 7;
 	ghost->intelligence = 2;
 	ghost->dexterity = 3;
 	final_boss = new Creature("Mephistopheles", "The Prince of Hell. A humanoid demon with red skin, large horns and devious face. It has three unmatched pairs of wings.", final_room, 35);
+	final_boss->hit_points = 1;
+	final_boss->min_damage = 5;
+	final_boss->max_damage = 11;
+	final_boss->min_protection = 7;
+	final_boss->max_protection = 8;
+	final_boss->strength = 3;
+	final_boss->intelligence = 4;
+	final_boss->dexterity = 3;
 
 	entities.push_back(butler);
 	entities.push_back(witch);
 	entities.push_back(troll);
 	entities.push_back(ghost);
+	entities.push_back(final_boss);
 
 	// Items -----
 	Item* mailbox = new Item("Mailbox", "Looks like it might contain something.", house, 3, 3);
 	Item* key = new Item("Key", "Old iron key.", mailbox, 0, 1);
 	ex3->key = key;
 	Item* sack = new Item("Sack", "Brown old sack. Looks like it might contain something.", forest, 5, 4);
-	Item* apple = new Item("Apple", "A perfect red apple.", sack, 0, 1);
+	Item* apple = new Item("Apple", "A perfect red apple.", sack, 0, 1, true, HP_POTION);
+	apple->min_value = 2;
+	apple->max_value = 4;
 	Item* crystal_ball = new Item("Palantir", "The witch uses it as a clairvoyant ball. It's The Purple Eye.", forest, 0, 2);
 	Item* chest = new Item("Chest", "Wooden small chest with iron lock.", cave, 4, 3);
 	chest->locked = true;
@@ -167,12 +180,60 @@ World::World()
 	entities.push_back(shield);
 
 	// Player ----
-	player = new Player("Hero", "You are an awesome adventurer!", forest, 15);
+	player = new Player("Hero", "You are an awesome adventurer!", forest, 12);
 	player->hit_points = 20;
+	player->mana_points = 8;
 	player->strength = 1;
 	player->dexterity = 2;
 	player->intelligence = 2;
 	entities.push_back(player);
+
+	// Spells and Scrolls---
+	Spell* stupidity = new Spell("Stupidity", "", ATTACK, HEAL, 2);
+	stupidity->min_value = 0;
+	stupidity->max_value = 6;
+	//player->AddSpell(stupidity);
+	Item* stupid_scroll = new Item("Stupidity-scroll", "A magic scripture. Allows to learn the Stupidity spell.", forest, 0, 1, true, SCROLL);
+	stupid_scroll->spell = stupidity;
+
+	Spell* enrage = new Spell("Enrage", "", ATTACK, BUFF, 3);
+	enrage->stat = STR;
+	enrage->min_value = 7;
+	enrage->max_value = 10;
+	//player->AddSpell(enrage);
+	Item* enrage_scroll = new Item("Enrage-scroll", "A magic scripture. Allows to learn the Enrage spell.", forest, 0, 1, true, SCROLL);
+	enrage_scroll->spell = enrage;
+	
+	Spell* shock = new Spell("Shock", "", ATTACK, DEBUFF, 2);
+	shock->stat = DEX;
+	shock->min_value = 3;
+	shock->max_value = 5;
+	//player->AddSpell(shock);
+	Item* shock_scroll = new Item("Shock-scroll", "A magic scripture. Allows to learn the Shock spell.", treasure_room, 0, 1, true, SCROLL);
+	shock_scroll->spell = shock;
+
+	Spell*  black_blood = new Spell("BlackBlood", "", HEAL, ATTACK, 3);
+	black_blood->min_value = 0;
+	black_blood->max_value = 6;
+	//player->AddSpell(black_blood);
+	Item* blackblood_scroll = new Item("BlackBlood-scroll", "A magic scripture. Allows to learn the BlackBlood spell.", treasure_room, 0, 1, true, SCROLL);
+	blackblood_scroll->spell = black_blood;
+
+	Spell* ultra_instinct = new Spell("UltraInstinct", "", HEAL, BUFF, 3);
+	ultra_instinct->stat = DEX;
+	ultra_instinct->min_value = 4;
+	ultra_instinct->max_value = 8;
+	//player->AddSpell(ultra_instinct);
+	Item* ui_scroll = new Item("UltraInstinct-scroll", "A magic scripture. Allows to learn the UltraInstinct spell.", treasure_room, 0, 1, true, SCROLL);
+	ui_scroll->spell = ultra_instinct;
+
+	Spell* oblivion = new Spell("Oblivion", "", HEAL, DEBUFF, 1);
+	oblivion->stat = INT;
+	oblivion->min_value = 15;
+	oblivion->max_value = 20; // Yes, that means you won't use magic effectively anymore
+	//player->AddSpell(oblivion);
+	Item* oblivion_scroll = new Item("Oblivion-scroll", "A magic scripture. Allows to learn the Oblivion spell.", treasure_room, 0, 1, true, SCROLL);
+	oblivion_scroll->spell = oblivion;
 
 	// Objectives ----
 	objectives.push_back(crystal_ball);
@@ -274,6 +335,10 @@ bool World::ParseCommand(vector<string>& args)
 			{
 				player->Inventory();
 			}
+			else if (Same(args[0], "spells") || Same(args[0], "sp"))
+			{
+				player->SpellsBook();
+			}
 			else
 				ret = false;
 			break;
@@ -320,6 +385,14 @@ bool World::ParseCommand(vector<string>& args)
 			{
 				player->Move(args);
 			}
+			else if (Same(args[0], "use") || Same(args[0], "u"))
+			{
+				player->Use(args);
+			}
+			else if (Same(args[0], "read") || Same(args[0], "rd"))
+			{
+				player->Read(args);
+			}
 			else
 				ret = false;
 			break;
@@ -345,6 +418,10 @@ bool World::ParseCommand(vector<string>& args)
 			else if(Same(args[0], "drop") || Same(args[0], "put"))
 			{
 				player->Drop(args);
+			}
+			else if (Same(args[0], "cast") || Same(args[0], "c"))
+			{
+				player->Cast(args);
 			}
 			else
 				ret = false;
