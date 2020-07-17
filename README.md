@@ -61,3 +61,31 @@ Creatures have a Spell Book which is the "inventory" of known spells. Each Spell
 Some item_type's were added. Now there are HP_POTIONs MP_POTIONs and SCROLLS. The first two types heal the corresponding stat, and the SCROLL, when used, adds a specific Spell to the player's Spells Book.
 
 Each of this item_type's are single-use and they are consumed after usage.
+
+## How to play
+The game works by commands. There commands with 0, 1 or 3 arguments. When you areive at a Room all its description and all Entities there, are listed.
+The visible Exits will be listed with its "direction name" between parenthesis.
+
+Now then, the commands:
+- Look. With 0 arguments outputs Room description. With one argument outputs the specified Entity description and, if it contains something and it's not locked, it also outputs it.
+- Go direction_name. Moves the player to the room that Exit points.
+- Take item_name. Takes specified Item from the Room and puts in players inventory if allowed. If the command is "take item_name from other_item_name", tries to take an item from inside another item, the second currently being either in Inventory or in Room.
+- Drop item_name. Inverse of take command. It moves an Item on player's inventory to the current Room. If the command is "drop item_name to other_item_name", tries to move it inside another Item.
+- Equip/unequip item_name. Sets/unsets specified Item as weapon or armour if possible.
+- Use item_name. Uses and consumes specified Item from Inventory if possible.
+- Inventory. Lists Player's possessions and possible Items inside them.
+- Spells. Lists known Player's known spells (Spells on Spells Book).
+- Loot creature_name. Puts all possessions from a DEAD Creature on Player's inventory.
+- Stats. Lists player's stats.
+- Examine creature_name. Lists specified creature's stats.
+- Lock/Unlock entity_name with key_name. Tries to lock/unlock an Item or Exit with the specified Item as key. It will only be accomplish if it's the correct key and if the target is not already locked/unlocked.
+- Move item_name. Moves the specified Item on the Room. If it was hiding something, it is revealed.
+- Attack creature_name. Performs an attack against the specified creature, with the damage computation specified above. Uses equipped weapon if any.
+- Cast spell_name on creature_name. Applies the Spells' effect/s on the target. The target can also be "me" if the player wants to cadt it on itself.
+- Read spell_name. Outputs the description of specified Spell if it is on the Spells Book.
+
+This are the main commands. Complete list and aliases for them can be found on 'world.cpp'.
+
+## Author
+Pol Pérez Granero- [Mefiso](https://github.com/Mefiso)
+Code [here](https://github.com/Mefiso/zork)
