@@ -367,13 +367,41 @@ bool Creature::IsAlive() const
 // ----------------------------------------------------
 void Creature::Tick()
 {
-	/* If the combat target is in the current room, attacks it. */
+	/* If the combat target is in the current room, attacks it or casts a spell, with certain probability. */
 	if(combat_target != NULL)
 	{
-		if(parent->Find(combat_target) == true)
-			MakeAttack();
-		else
-			combat_target = NULL;
+		
+		if (parent->Find(combat_target) == true) {
+			int choice = 0;
+			if (spells_book.size() > 0)
+				choice = rand() % 3;
+			switch (choice) {
+			case 0:
+				MakeAttack();
+				break;
+			case 1:
+			case 2:
+				int sp = rand() % spells_book.size();
+				int i = 0;
+				for (list<Spell*>::const_iterator it = spells_book.begin(); it != spells_book.cend(); ++it)
+				{
+					if (i == sp) {
+						if (mana_points - (*it)->cost < 0) {
+							MakeAttack();
+							return;
+						}
+						else {
+							string n = ((*it)->spell_type == HEAL || (*it)->spell_type == BUFF) ? name : combat_target->name;
+							vector<string> args{ "cast", (*it)->name, "on", n };
+							Cast(args);
+							break;
+						}
+					}
+					i++;
+				}
+			}
+
+		}
 	}
 }
 
@@ -432,15 +460,19 @@ void Creature::Cast(vector<string>& args)
 	}
 
 	Spell* spell = FindSpell(args[1]);
-
+	
 	if (spell == NULL || mana_points-(spell->cost) < 0)
 		return;
 
-	Creature* target = (Creature*)parent->Find(args[3], CREATURE);
 	
+	Creature* target = (Creature*)parent->Find(args[3], CREATURE);
+
+	if(target == NULL)
+		target = (Creature*)parent->Find(PLAYER);
+
 	if (target == NULL || !target->IsAlive()) // No target or dead
 		return;
-
+	
 	mana_points -= spell->cost;
 
 	// Create a functions map to deal with each type of spell.
@@ -457,7 +489,7 @@ void Creature::Cast(vector<string>& args)
 
 	int result = spell->GetValue() + intelligence;
 	if (spell->spell_type == DEBUFF || spell->spell_type == BUFF)
-		target_stat = spell->stat;
+		target->target_stat = spell->stat;
 
 	(target->*(spell_map[spell->spell_type]))(result);
 	if (spell->spell_type != spell->second_type) {
@@ -502,7 +534,7 @@ void Creature::ReceiveMAttack(int damage)
 	hit_points -= received;
 	if (PlayerInRoom())
 		cout << name << " is hit for " << received << " damage (" << prot << " deflected, " << dexterity / 2 << " dodged) \n";
-	cout << "GG";
+	
 	if (IsAlive() == false)
 		Die();
 

@@ -294,6 +294,10 @@ World::World()
 	player->dexterity = 2;
 	player->intelligence = 2;
 	entities.push_back(player);
+	ghost->combat_target = player;
+	troll->combat_target = player;
+	drake->combat_target = player;
+	final_boss->combat_target = player;
 
 	// Spells and Scrolls---
 	Spell* stupidity = new Spell("Stupidity", "A tricky spell. It can both harm and heal.", ATTACK, HEAL, 2);

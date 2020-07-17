@@ -441,7 +441,7 @@ void Player::Cast(vector<string>& args)
 
 	int result = spell->GetValue() + intelligence;
 	if (spell->spell_type == DEBUFF || spell->spell_type == BUFF)
-		target_stat = spell->stat;
+		target->target_stat = spell->stat;
 	
 	(target->*(spell_map[spell->spell_type]))(result);
 	
