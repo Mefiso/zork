@@ -36,5 +36,7 @@ Furthermore, Creatures have now more stats:
 
 The damage computation was modified to use the new stats.
 Also, WEAPON item_type was divided into melee wepaon and distance weapon.
-Then, the attack damage is the sum of wepaon/min-max damage roll
+Then, the attack damage is the sum of wepaon/min-max damage roll plus strength if melee weapon or plus dexterity if distance weapon.
+
+The NPC behaviour when attacked is: 33% attacks, 66% casts a known spell if enough mana.
 
