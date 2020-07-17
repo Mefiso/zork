@@ -185,8 +185,8 @@ World::World()
 	hp2->min_value = 5;
 	hp2->max_value = 10;
 	Item* mp2 = new Item("Small_MP_potion", "A diminute flask containing a blue beberage.", alchemist, 0, 2, true, MP_POTION);
-	mp1->min_value = 1;
-	mp1->max_value = 4;
+	mp2->min_value = 1;
+	mp2->max_value = 4;
 
 	Item* monolith = new Item("Monolith", "A large monolith in the middle of the peak. It has some runes inscribed on it.", hilltop, 0, 14, false);
 	monolith->hiding = ex10;
@@ -237,11 +237,11 @@ World::World()
 
 	Item* trident = new Item("Trident", "Scarlet giant trident. It holds the power of Hell.", final_boss, 0, 7, true, M_WEAPON);
 	trident->min_value = 5;
-	trident->min_value = 9;
+	trident->max_value = 9;
 
 	Item* mastersword = new Item("Mastersword", "A beautifully crafted magical sword. It holds the power of wind and forest.", altar, 0, 4, true, M_WEAPON);
 	mastersword->min_value = 4;
-	mastersword->min_value = 8;
+	mastersword->max_value = 8;
 
 	butler->AutoEquip();
 	witch->AutoEquip();
