@@ -37,6 +37,27 @@ Furthermore, Creatures have now more stats:
 The damage computation was modified to use the new stats.
 Also, WEAPON item_type was divided into melee wepaon and distance weapon.
 Then, the attack damage is the sum of wepaon/min-max damage roll plus strength if melee weapon or plus dexterity if distance weapon.
+Finally, the received damage is reduced by the protection roll + half dexterity stat of the Creature receiving damage.
 
 The NPC behaviour when attacked is: 33% attacks, 66% casts a known spell if enough mana.
 
+### Introduction and epilogue
+A storyline is introduced when the game is started and some Items are marked as objective. When the player has all the objectives the game takes him to the final scene/battle.
+
+### Lock and hidden
+Now some Items can be locked also, like Exits. Furthermore, the hidden property is added. An exit or an Item that is hidden, is not listed when the player looks around, even if specificaly searching for it.
+Also, the Items can be "moved" around without taking them. If you move an Item that was hiding something the hidden Entity is revealed.
+
+### Magic system
+A new class Spell was added. Spells are Entities that can be casted with the command "cast". They have a min and max value to determine the specific effect and can have 
+up to 2 types of effects. Each effect type can be HEAL, make ATTACK, BUFF a stat and DEBUFF a stat.
+
+Spells can be cast on any target (yourself or other Creatures), so yes, you can heal your enemy. The numeric effect of a Spell (that is, the damage or the HP healed, or the stat buff) is the result of the Roll + Intelligence of the caster.
+The effect however, if it's a damage or a debuff, is mitigated by the target's Intelligence.
+
+Creatures have a Spell Book which is the "inventory" of known spells. Each Spell has a mana cost, if a Creature hasn't got enough mana_points left, it can't cast the Spell.
+
+### Usable objects
+Some item_type's were added. Now there are HP_POTIONs MP_POTIONs and SCROLLS. The first two types heal the corresponding stat, and the SCROLL, when used, adds a specific Spell to the player's Spells Book.
+
+Each of this item_type's are single-use and they are consumed after usage.
