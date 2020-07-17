@@ -68,6 +68,7 @@ void Player::Look(const vector<string>& args) const
 	}
 }
 
+// ----------------------------------------------------
 void Player::Read(const vector<string>& args) const
 {
 	Spell* spell = FindSpell(args[1]);
@@ -398,6 +399,7 @@ bool Player::Attack(const vector<string>& args)
 	return true;
 }
 
+// ----------------------------------------------------
 void Player::Cast(vector<string>& args)
 {
 	/* Rolls damage/heal/other depending on the spell type. It also makes this
@@ -630,6 +632,7 @@ bool Player::UnLock(const vector<string>& args)
 	return true;
 }
 
+// ----------------------------------------------------
 bool Player::Move(const vector<string>& args)
 {
 	Item* item = (Item*)parent->Find(args[1], ITEM);
@@ -651,6 +654,7 @@ bool Player::Move(const vector<string>& args)
 	return true;
 }
 
+// ----------------------------------------------------
 bool Player::Use(const vector<string>& args)
 {
 	Item* item = (Item*)Find(args[1], ITEM);
@@ -691,9 +695,11 @@ bool Player::Use(const vector<string>& args)
 	return true;
 }
 
+// ----------------------------------------------------
 void Player::Tick()
 {}
 
+// ----------------------------------------------------
 void Player::Die() {
 	cout << "You die. You couldn't complete your quest and now you're dead.\n";
 }

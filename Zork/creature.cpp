@@ -377,16 +377,16 @@ void Creature::Tick()
 				choice = rand() % 3;
 			switch (choice) {
 			case 0:
-				MakeAttack();
+				MakeAttack(); // 1/3 to make an attack.
 				break;
 			case 1:
 			case 2:
-				int sp = rand() % spells_book.size();
+				int sp = rand() % spells_book.size(); // Choose random spell
 				int i = 0;
 				for (list<Spell*>::const_iterator it = spells_book.begin(); it != spells_book.cend(); ++it)
 				{
 					if (i == sp) {
-						if (mana_points - (*it)->cost < 0) {
+						if (mana_points - (*it)->cost < 0) { // if not enough mana, attack
 							MakeAttack();
 							return;
 						}
