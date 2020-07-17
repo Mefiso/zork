@@ -501,7 +501,7 @@ void Creature::ReceiveMAttack(int damage)
 	int received = (damage - prot - dexterity / 2) > 0 ? damage - prot - dexterity / 2 : 0;
 	hit_points -= received;
 	if (PlayerInRoom())
-		cout << name << " is hit for " << received << " damage (" << prot << " blocked, " << dexterity / 2 << " dodged) \n";
+		cout << name << " is hit for " << received << " damage (" << prot << " deflected, " << dexterity / 2 << " dodged) \n";
 	cout << "GG";
 	if (IsAlive() == false)
 		Die();
